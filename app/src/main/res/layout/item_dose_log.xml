@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:background="#FFFFFF"
+    android:elevation="2dp"
+    android:orientation="vertical"
+    android:padding="18dp">
+
+    <TextView
+        android:id="@+id/tvHistoryMedicineName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/vitamin_d"
+        android:textColor="#202544"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:ignore="VisualLintSystemUi" />
+
+    <TextView
+        android:id="@+id/tvHistoryDosage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/_1_tablet"
+        android:textColor="#737991"
+        android:textSize="14sp"
+        tools:ignore="TextContrastCheck" />
+
+    <TextView
+        android:id="@+id/tvHistoryDateTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/_11_oct_2026_08_00_am"
+        android:textColor="#737991"
+        android:textSize="14sp"
+        tools:ignore="TextContrastCheck" />
+
+    <TextView
+        android:id="@+id/tvHistoryStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/taken"
+        android:textColor="#23824B"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

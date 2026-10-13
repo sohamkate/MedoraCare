@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_medicine"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tvReminderTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/_08_00_am"
+        android:textColor="#202544"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:ignore="VisualLintSystemUi" />
+
+    <Switch
+        android:id="@+id/switchReminderEnabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/enabled"
+        android:textColor="#737991"
+        android:textSize="12sp"
+        tools:ignore="TextContrastCheck,UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck,VisualLintSystemUi" />
+
+    <ImageButton
+        android:id="@+id/btnDeleteReminderTime"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/delete_reminder_time"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_delete"
+        app:tint="#B42318"
+        tools:ignore="TouchTargetSizeCheck" />
+
+</LinearLayout>

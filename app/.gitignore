@@ -1,0 +1,22 @@
+```gitignore
+# Gradle
+.gradle/
+**/build/
+
+# Local machine configuration
+local.properties
+
+# Android Studio
+.idea/caches/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/shelf/
+*.iml
+
+# Native build output
+.externalNativeBuild/
+.cxx/
+
+# Generated files
+captures/
+```
