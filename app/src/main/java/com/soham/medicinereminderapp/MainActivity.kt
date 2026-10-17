@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.soham.medicinereminderapp.data.AppDatabase
 import com.soham.medicinereminderapp.data.Medicine
+import com.soham.medicinereminderapp.reminder.LowStockWorkScheduler
 import com.soham.medicinereminderapp.reminder.ReminderScheduler
 import com.soham.medicinereminderapp.repository.MedicineRepository
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +38,9 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { granted ->
-            if (!granted) {
+            if (granted) {
+                LowStockWorkScheduler.checkNow(this)
+            } else {
                 Toast.makeText(
                     this,
                     "Notifications are disabled. Enable them in Settings to receive reminders.",
@@ -56,15 +59,12 @@ class MainActivity : AppCompatActivity() {
         val rvMedicines = findViewById<RecyclerView>(R.id.rvMedicines)
         val layoutEmptyState = findViewById<View>(R.id.layoutEmptyState)
 
-        // Bottom navigation
         val bottomNavigation =
             findViewById<BottomNavigationView>(R.id.bottomNavigation)
 
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    true
-                }
+                R.id.nav_home -> true
 
                 R.id.nav_history -> {
                     startActivity(
@@ -77,8 +77,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val dao =
-            AppDatabase.getDatabase(applicationContext).medicineDao()
+        val dao = AppDatabase
+            .getDatabase(applicationContext)
+            .medicineDao()
 
         repository = MedicineRepository(dao)
 
@@ -86,18 +87,25 @@ class MainActivity : AppCompatActivity() {
 
         requestNotificationPermission()
 
+        // Schedule recurring stock checks and run one immediately.
+        LowStockWorkScheduler.schedulePeriodic(this)
+        LowStockWorkScheduler.checkNow(this)
+
         adapter = MedicineAdapter(
             onEditClick = { medicine ->
                 val intent = Intent(
                     this,
                     AddMedicineActivity::class.java
-                )
-                intent.putExtra("medicineId", medicine.id)
+                ).apply {
+                    putExtra("medicineId", medicine.id)
+                }
                 startActivity(intent)
             },
+
             onDeleteClick = { medicine ->
                 deleteMedicine(medicine)
             },
+
             onDoseAction = { doseLog, taken ->
                 lifecycleScope.launch {
                     try {
@@ -110,6 +118,13 @@ class MainActivity : AppCompatActivity() {
                             } else {
                                 repository.markDoseAsNotTaken(doseLog.id)
                             }
+                        }
+
+                        // Recheck supply after stock is deducted.
+                        if (taken) {
+                            LowStockWorkScheduler.checkNow(
+                                this@MainActivity
+                            )
                         }
 
                         Toast.makeText(
@@ -129,6 +144,17 @@ class MainActivity : AppCompatActivity() {
                         ).show()
                     }
                 }
+            },
+
+            onRefillClick = { medicine ->
+                val intent = Intent(
+                    this,
+                    RefillMedicineActivity::class.java
+                ).apply {
+                    putExtra("medicineId", medicine.id)
+                }
+
+                startActivity(intent)
             }
         )
 
@@ -144,6 +170,13 @@ class MainActivity : AppCompatActivity() {
 
         observeMedicines(layoutEmptyState, tvEmptyMessage)
         observeTodayDoseLogs()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Recheck stock when returning from Add/Edit/Refill.
+        LowStockWorkScheduler.checkNow(this)
     }
 
     private fun observeMedicines(
@@ -172,12 +205,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeTodayDoseLogs() {
-        val calendar = Calendar.getInstance()
-
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
 
         val startOfDay = calendar.timeInMillis
 
@@ -208,10 +241,17 @@ class MainActivity : AppCompatActivity() {
                             this@MainActivity,
                             reminderTime.id
                         )
+
+                        ReminderScheduler.cancelSnooze(
+                            this@MainActivity,
+                            reminderTime.id
+                        )
                     }
 
                     repository.deleteMedicine(medicine)
                 }
+
+                LowStockWorkScheduler.checkNow(this@MainActivity)
 
                 Toast.makeText(
                     this@MainActivity,

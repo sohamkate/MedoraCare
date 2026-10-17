@@ -54,7 +54,8 @@ dependencies {
 
     // CardView used by item_medicine.xml
     implementation("androidx.cardview:cardview:1.0.0")
-
+// Background low-stock checks
+    implementation("androidx.work:work-runtime-ktx:2.10.5")
     // Unit and instrumentation tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)

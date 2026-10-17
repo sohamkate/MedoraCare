@@ -1,197 +1,287 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:fillViewport="true"
-    android:scrollbars="none">
+    android:background="#F7F8FC"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="22dp">
+        android:padding="20dp">
 
-        <!-- Screen title -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/Add_medicine"
-            android:textColor="#202544"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            tools:ignore="VisualLintSystemUi" />
+            android:text="Medicine details"
+            android:textColor="#20243A"
+            android:textSize="26sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="@string/enter_medicine_details_and_set_your_reminders"
-            android:textColor="#000000"
-            android:textSize="15sp"
-            tools:ignore="TextContrastCheck" />
+            android:layout_marginBottom="20dp"
+            android:text="Stay consistent, stay healthy."
+            android:textColor="#687086"
+            android:textSize="14sp" />
 
-        <!-- Medicine name -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="@string/medicine_name"
-            android:textColor="#202544"
-            android:textSize="16sp"
+            android:text="Medicine name *"
+            android:textColor="#292E43"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etMedicineName"
             android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="10dp"
-            android:autofillHints=""
-            android:background="#FFFFFF"
-            android:hint="@string/e_g_vitamin_d"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="14dp"
+            android:hint="e.g. Vitamin D"
             android:inputType="textCapSentences"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:textColor="#202544"
-            android:textColorHint="#888888"
-            android:textSize="16sp"
-            tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
+            android:minHeight="52dp"
+            android:padding="12dp"
+            android:backgroundTint="#777D98" />
 
-        <!-- Dosage -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:text="@string/dosage"
-            android:textColor="#202544"
-            android:textSize="16sp"
+            android:text="Dosage *"
+            android:textColor="#292E43"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etDosage"
             android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="10dp"
-            android:autofillHints=""
-            android:background="#FFFFFF"
-            android:hint="@string/e_g_1_tablet"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="14dp"
+            android:hint="e.g. 1 tablet"
             android:inputType="textCapSentences"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:textColor="#202544"
-            android:textColorHint="#888888"
-            android:textSize="16sp"
-            tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
+            android:minHeight="52dp"
+            android:padding="12dp"
+            android:backgroundTint="#777D98" />
 
-        <!-- Optional medicine notes -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:text="@string/notes"
-            android:textColor="#202544"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:ignore="TextContrastCheck" />
+            android:text="Notes (optional)"
+            android:textColor="#292E43"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etMedicineNotes"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginTop="10dp"
-            android:background="#FFFFFF"
-            android:gravity="top|start"
-            android:hint="@string/e_g_take_after_food"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="22dp"
+            android:gravity="top"
+            android:hint="Additional information"
             android:inputType="textCapSentences|textMultiLine"
-            android:maxLength="500"
-            android:padding="14dp"
-            android:textColor="#202544"
-            android:textColorHint="#888888"
-            android:textSize="15sp"
-            tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
+            android:minHeight="80dp"
+            android:padding="12dp"
+            android:backgroundTint="#777D98" />
 
-        <!-- Repeat on -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#DFE2EC" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/repeat_on"
-            android:textColor="#222222"
-            android:textSize="16sp"
+            android:layout_marginTop="20dp"
+            android:text="Reminder schedule"
+            android:textColor="#20243A"
+            android:textSize="20sp"
             android:textStyle="bold" />
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="false"
-            android:scrollbars="none">
 
-        <!-- Weekdays displayed vertically -->
-        <LinearLayout
-            android:id="@+id/layoutWeekdays"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/chipSunday"
-                style="@style/WeekdayChip"
-                android:text="@string/Sun"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/chipMonday"
-                style="@style/WeekdayChip"
-                android:text="@string/Mon"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/chipTuesday"
-                style="@style/WeekdayChip"
-                android:text="@string/Tue"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/chipWednesday"
-                style="@style/WeekdayChip"
-                android:text="@string/Wed"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/chipThursday"
-                style="@style/WeekdayChip"
-                android:text="@string/Thur"
-                android:textSize="12sp"
-                tools:ignore="TextContrastCheck" />
-
-            <TextView
-                android:id="@+id/chipFriday"
-                style="@style/WeekdayChip"
-                android:text="@string/Fri"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/chipSaturday"
-                style="@style/WeekdayChip"
-                android:text="@string/Sat"
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-        </HorizontalScrollView>
-
-
-
-        <!-- Medicine photo -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="8dp"
+            android:text="Choose when this medicine should be scheduled."
+            android:textColor="#687086"
+            android:textSize="14sp" />
+
+        <RadioGroup
+            android:id="@+id/rgScheduleType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rbDateRange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:padding="6dp"
+                android:text="Every day within a date range"
+                android:textColor="#292E43" />
+
+            <RadioButton
+                android:id="@+id/rbSelectedDates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="6dp"
+                android:text="Only on selected dates"
+                android:textColor="#292E43" />
+
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btnStartDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="52dp"
+            android:text="Choose start date" />
+
+        <Button
+            android:id="@+id/btnEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="52dp"
+            android:text="Choose end date" />
+
+        <Button
+            android:id="@+id/btnAddSelectedDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="52dp"
+            android:text="Add a calendar date"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvSelectedDates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="12dp"
+            android:text="No individual dates selected"
+            android:textColor="#292E43"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:layout_marginTop="22dp"
-            android:text="@string/Medicine_photo"
-            android:textColor="#202544"
-            android:textSize="16sp"
+            android:background="#DFE2EC" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Reminder times"
+            android:textColor="#20243A"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Add one or more times for each scheduled day."
+            android:textColor="#687086"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnAddTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:minHeight="52dp"
+            android:text="Add reminder time" />
+
+        <TextView
+            android:id="@+id/tvSelectedTimes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="12dp"
+            android:text="No reminder times added"
+            android:textColor="#292E43"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="22dp"
+            android:background="#DFE2EC" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Medicine stock (optional)"
+            android:textColor="#20243A"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="8dp"
+            android:text="Enter these details when adding a new medicine."
+            android:textColor="#687086"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etInitialStock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:hint="Initial stock quantity"
+            android:inputType="numberDecimal"
+            android:minHeight="52dp"
+            android:padding="12dp"
+            android:backgroundTint="#777D98" />
+
+        <EditText
+            android:id="@+id/etUnitsPerDose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:hint="Units used per dose"
+            android:inputType="numberDecimal"
+            android:minHeight="52dp"
+            android:padding="12dp"
+            android:backgroundTint="#777D98" />
+
+        <EditText
+            android:id="@+id/etStockUnit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:hint="Stock unit (e.g. tablets)"
+            android:inputType="textCapSentences"
+            android:minHeight="52dp"
+            android:padding="12dp"
+            android:backgroundTint="#777D98" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#DFE2EC" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Medicine photo (optional)"
+            android:textColor="#20243A"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <ImageView
@@ -200,81 +290,29 @@
             android:layout_height="140dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="12dp"
-            android:background="#E5E9FF"
-            android:contentDescription="@string/selected_medicine_photo"
+            android:contentDescription="Medicine photo preview"
             android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_camera"
-            tools:ignore="ImageContrastCheck,RedundantDescriptionCheck" />
+            android:src="@android:drawable/ic_menu_gallery"
+            android:background="#E8EAF2" />
 
         <Button
             android:id="@+id/btnCaptureMedicine"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#E5E9FF"
-            android:text="@string/take_medicine_photo"
-            android:textAllCaps="false"
-            android:textColor="#3548B8"
-            android:textSize="16sp"
-            tools:ignore="VisualLintButtonSize" />
-        <!-- Reminder schedule section -->
-        <TextView
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="@string/Schedule_reminder"
-            android:textColor="#202544"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="10dp"
+            android:minHeight="52dp"
+            android:text="Capture medicine photo" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/add_every_time_you_need_to_take_this_medicine"
-            android:textColor="#000000"
-            android:textSize="14sp"
-            tools:ignore="TextContrastCheck" />
-        <!-- Add reminder time -->
-        <Button
-            android:id="@+id/btnAddTime"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#E5E9FF"
-            android:text="@string/add_reminder_time"
-            android:textAllCaps="false"
-            android:textColor="#3548B8"
-            android:textSize="14sp"
-            tools:ignore="VisualLintButtonSize" />
-
-        <TextView
-            android:id="@+id/tvSelectedTimes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:background="#FFFFFF"
-            android:lineSpacingExtra="8dp"
-            android:padding="16dp"
-            android:text="@string/no_reminder_times_selected"
-            android:textColor="#202544"
-            android:textSize="15sp" />
-
-        <!-- Save medicine button -->
         <Button
             android:id="@+id/btnSaveMedicine"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:layout_marginBottom="20dp"
-            android:backgroundTint="#5265D8"
-            android:text="@string/save_medicine"
+            android:minHeight="56dp"
+            android:text="Save medicine"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            tools:ignore="VisualLintButtonSize" />
+            android:textSize="16sp" />
 
     </LinearLayout>
-
 </ScrollView>

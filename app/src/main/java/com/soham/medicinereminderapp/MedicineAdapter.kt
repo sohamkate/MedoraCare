@@ -24,7 +24,8 @@ import java.util.Locale
 class MedicineAdapter(
     private val onEditClick: (Medicine) -> Unit,
     private val onDeleteClick: (Medicine) -> Unit,
-    private val onDoseAction: (DoseLog, Boolean) -> Unit
+    private val onDoseAction: (DoseLog, Boolean) -> Unit,
+    private val onRefillClick: (Medicine) -> Unit
 ) : ListAdapter<MedicineWithTimes, MedicineAdapter.MedicineViewHolder>(
     DiffCallback
 ) {
@@ -77,8 +78,91 @@ class MedicineAdapter(
         private val btnDelete: Button =
             itemView.findViewById(R.id.btnDelete)
 
+        private val btnRefill: Button =
+            itemView.findViewById(R.id.btnRefill)
+
         private val layoutDoseActions: LinearLayout =
             itemView.findViewById(R.id.layoutDoseActions)
+
+        private val tvStockQuantity: TextView =
+            itemView.findViewById(R.id.tvStockQuantity)
+
+        private val tvStockDaysRemaining: TextView =
+            itemView.findViewById(R.id.tvStockDaysRemaining)
+
+        private val tvStockWarning: TextView =
+            itemView.findViewById(R.id.tvStockWarning)
+
+        private fun bindStockStatus(item: MedicineWithTimes) {
+            val medicine = item.medicine
+            val stock = medicine.currentStock
+            val unitsPerDose = medicine.unitsPerDose
+
+            tvStockWarning.visibility = View.GONE
+
+            if (stock == null || unitsPerDose == null || unitsPerDose <= 0.0) {
+                tvStockQuantity.text = "Stock remaining: Stock not set"
+                tvStockDaysRemaining.text = "Estimated supply: Not available"
+                return
+            }
+
+            tvStockQuantity.text =
+                "Stock remaining: ${formatQuantity(stock)} ${medicine.stockUnit}"
+
+            val enabledTimes = item.reminderTimes.filter { it.isEnabled }
+
+            val selectedDays = medicine.weekdays
+                .split(",")
+                .mapNotNull { it.trim().toIntOrNull() }
+                .filter { it in 1..7 }
+                .distinct()
+
+            if (enabledTimes.isEmpty() || selectedDays.isEmpty()) {
+                tvStockDaysRemaining.text =
+                    "Estimated supply: Schedule unavailable"
+                return
+            }
+
+            val dosesPerDay =
+                enabledTimes.size.toDouble() * selectedDays.size / 7.0
+
+            val unitsUsedPerDay = dosesPerDay * unitsPerDose
+
+            if (unitsUsedPerDay <= 0.0) {
+                tvStockDaysRemaining.text =
+                    "Estimated supply: Not available"
+                return
+            }
+
+            val daysRemaining = stock / unitsUsedPerDay
+
+            tvStockDaysRemaining.text =
+                "Estimated supply: ${
+                    String.format(Locale.getDefault(), "%.1f", daysRemaining)
+                } days"
+
+            if (stock <= 0.0) {
+                tvStockWarning.text =
+                    "Stock depleted — check physical stock"
+                tvStockWarning.setTextColor(Color.RED)
+                tvStockWarning.visibility = View.VISIBLE
+            } else if (daysRemaining <= medicine.lowStockDays) {
+                tvStockWarning.text =
+                    "Low stock — refill may be needed"
+                tvStockWarning.setTextColor(Color.rgb(180, 83, 9))
+                tvStockWarning.visibility = View.VISIBLE
+            }
+        }
+
+        private fun formatQuantity(value: Double): String {
+            return if (value % 1.0 == 0.0) {
+                value.toLong().toString()
+            } else {
+                String.format(Locale.getDefault(), "%.2f", value)
+                    .trimEnd('0')
+                    .trimEnd('.')
+            }
+        }
 
         fun bind(item: MedicineWithTimes) {
             val medicine = item.medicine
@@ -86,7 +170,9 @@ class MedicineAdapter(
             tvMedicineName.text = medicine.name
             tvDosage.text = medicine.dosage
 
-            // Display medicine photo
+            bindStockStatus(item)
+
+            // Display medicine photo.
             val imagePath = medicine.imagePath
 
             if (!imagePath.isNullOrBlank() && File(imagePath).exists()) {
@@ -97,7 +183,7 @@ class MedicineAdapter(
                 )
             }
 
-            // Display optional notes
+            // Display optional notes.
             val notes = medicine.notes?.trim()
 
             if (!notes.isNullOrEmpty()) {
@@ -108,7 +194,7 @@ class MedicineAdapter(
                 tvMedicineNotes.visibility = View.GONE
             }
 
-            // Display enabled reminder times
+            // Display enabled reminder times.
             val enabledTimes = item.reminderTimes
                 .filter { it.isEnabled }
                 .sortedWith(compareBy({ it.hour }, { it.minute }))
@@ -134,7 +220,12 @@ class MedicineAdapter(
                 onDeleteClick(medicine)
             }
 
-            // Display today's dose actions
+            // Open the refill screen for this medicine.
+            btnRefill.setOnClickListener {
+                onRefillClick(medicine)
+            }
+
+            // Display today's dose actions.
             layoutDoseActions.removeAllViews()
 
             val logs = todayDoseLogs

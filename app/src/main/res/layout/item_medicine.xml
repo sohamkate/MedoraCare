@@ -68,6 +68,45 @@
 
             </LinearLayout>
         </LinearLayout>
+        <!-- Medicine stock status -->
+        <LinearLayout
+            android:id="@+id/layoutStockStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#F6F7FB"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvStockQuantity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stock remaining: Stock not set"
+                android:textColor="#252642"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvStockDaysRemaining"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Estimated supply: —"
+                android:textColor="#626579"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvStockWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="#B45309"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
         <!-- Medicine notes -->
         <TextView
@@ -96,7 +135,14 @@
                 android:text="@string/edit"
                 android:textAllCaps="false"
                 tools:ignore="ButtonStyle" />
-
+            <Button
+                android:id="@+id/btnRefill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Refill"
+                android:textAllCaps="false"
+                tools:ignore="ButtonStyle" />
             <Button
                 android:id="@+id/btnDelete"
                 android:layout_width="wrap_content"

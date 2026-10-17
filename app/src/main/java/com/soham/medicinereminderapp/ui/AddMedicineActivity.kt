@@ -1,18 +1,21 @@
+
 package com.soham.medicinereminderapp
 
 import android.Manifest
-import android.app.Activity
+import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,7 +25,10 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.soham.medicinereminderapp.data.AppDatabase
 import com.soham.medicinereminderapp.data.Medicine
+import com.soham.medicinereminderapp.data.MedicineScheduledDate
 import com.soham.medicinereminderapp.data.MedicineTime
+import com.soham.medicinereminderapp.reminder.LowStockWorkScheduler
+import com.soham.medicinereminderapp.reminder.MedicineSchedule
 import com.soham.medicinereminderapp.reminder.ReminderScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,18 +43,24 @@ class AddMedicineActivity : AppCompatActivity() {
     private lateinit var etMedicineName: EditText
     private lateinit var etDosage: EditText
     private lateinit var etMedicineNotes: EditText
+    private lateinit var etInitialStock: EditText
+    private lateinit var etUnitsPerDose: EditText
+    private lateinit var etStockUnit: EditText
+
     private lateinit var tvSelectedTimes: TextView
+    private lateinit var tvSelectedDates: TextView
     private lateinit var ivMedicinePreview: ImageView
+
     private lateinit var btnSaveMedicine: Button
     private lateinit var btnAddTime: Button
     private lateinit var btnCaptureMedicine: Button
-
-    private val database by lazy {
-        AppDatabase.getDatabase(applicationContext)
-    }
+    private lateinit var btnStartDate: Button
+    private lateinit var btnEndDate: Button
+    private lateinit var btnAddSelectedDate: Button
+    private lateinit var rgScheduleType: RadioGroup
 
     private val dao by lazy {
-        database.medicineDao()
+        AppDatabase.getDatabase(applicationContext).medicineDao()
     }
 
     private data class ReminderTime(
@@ -56,44 +68,36 @@ class AddMedicineActivity : AppCompatActivity() {
         val minute: Int
     )
 
-    // Calendar weekday constants:
-    // Sunday = 1, Monday = 2, ... Saturday = 7.
-    private val selectedWeekdays = mutableSetOf(
-        Calendar.SUNDAY,
-        Calendar.MONDAY,
-        Calendar.TUESDAY,
-        Calendar.WEDNESDAY,
-        Calendar.THURSDAY,
-        Calendar.FRIDAY,
-        Calendar.SATURDAY
+    private data class StockInputs(
+        val currentStock: Double?,
+        val unitsPerDose: Double?,
+        val stockUnit: String
     )
 
     private val reminderTimes = mutableListOf<ReminderTime>()
+    private val selectedDates = sortedSetOf<String>()
 
     private var medicineId = 0
     private var medicineImagePath: String? = null
-    private var isSaving = false
     private var photoFile: File? = null
+    private var isSaving = false
+    private var isEditMode = false
+
+    private var scheduleType = MedicineSchedule.DATE_RANGE
+    private var startDate: String? = null
+    private var endDate: String? = null
+
+    private val dateFormat =
+        SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
     private val takePictureLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-
-            if (success && photoFile?.exists() == true) {
-                medicineImagePath = photoFile!!.absolutePath
-
-                ivMedicinePreview.setImageURI(
-                    Uri.fromFile(photoFile)
-                )
-
-                Toast.makeText(
-                    this,
-                    "Medicine photo captured",
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (success) {
+                photoFile?.let { file ->
+                    medicineImagePath = file.absolutePath
+                    displayMedicineImage(file.absolutePath)
+                }
             } else {
-                photoFile?.delete()
-                photoFile = null
-
                 Toast.makeText(
                     this,
                     "Photo was not captured",
@@ -106,7 +110,6 @@ class AddMedicineActivity : AppCompatActivity() {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { granted ->
-
             if (granted) {
                 openCamera()
             } else {
@@ -123,28 +126,42 @@ class AddMedicineActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_medicine)
 
         initializeViews()
-        setupWeekdayChips()
+        setupCalendarControls()
         setupButtons()
 
         medicineId = intent.getIntExtra("medicineId", 0)
+        isEditMode = medicineId > 0
 
-        if (medicineId != 0) {
+        if (isEditMode) {
+            btnSaveMedicine.text = "Update medicine"
             loadMedicineForEditing(medicineId)
+        } else {
+            setStockInputsEnabled(true)
+            updateScheduleVisibility()
+            displayReminderTimes()
+            refreshSelectedDatesText()
         }
-
-        displayReminderTimes()
     }
 
     private fun initializeViews() {
         etMedicineName = findViewById(R.id.etMedicineName)
         etDosage = findViewById(R.id.etDosage)
         etMedicineNotes = findViewById(R.id.etMedicineNotes)
+        etInitialStock = findViewById(R.id.etInitialStock)
+        etUnitsPerDose = findViewById(R.id.etUnitsPerDose)
+        etStockUnit = findViewById(R.id.etStockUnit)
+
         tvSelectedTimes = findViewById(R.id.tvSelectedTimes)
+        tvSelectedDates = findViewById(R.id.tvSelectedDates)
         ivMedicinePreview = findViewById(R.id.ivMedicinePreview)
 
         btnSaveMedicine = findViewById(R.id.btnSaveMedicine)
         btnAddTime = findViewById(R.id.btnAddTime)
         btnCaptureMedicine = findViewById(R.id.btnCaptureMedicine)
+        btnStartDate = findViewById(R.id.btnStartDate)
+        btnEndDate = findViewById(R.id.btnEndDate)
+        btnAddSelectedDate = findViewById(R.id.btnAddSelectedDate)
+        rgScheduleType = findViewById(R.id.rgScheduleType)
     }
 
     private fun setupButtons() {
@@ -153,7 +170,16 @@ class AddMedicineActivity : AppCompatActivity() {
         }
 
         btnCaptureMedicine.setOnClickListener {
-            checkCameraPermission()
+            if (
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                openCamera()
+            } else {
+                requestCameraPermission.launch(Manifest.permission.CAMERA)
+            }
         }
 
         btnSaveMedicine.setOnClickListener {
@@ -161,140 +187,163 @@ class AddMedicineActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------
-    // WEEKDAY SELECTION
-    // ---------------------------------------------------------
+    // ---------------- CALENDAR SCHEDULING ----------------
 
-    private fun getWeekdayChips(): Map<Int, Int> {
-        return linkedMapOf(
-            R.id.chipSunday to Calendar.SUNDAY,
-            R.id.chipMonday to Calendar.MONDAY,
-            R.id.chipTuesday to Calendar.TUESDAY,
-            R.id.chipWednesday to Calendar.WEDNESDAY,
-            R.id.chipThursday to Calendar.THURSDAY,
-            R.id.chipFriday to Calendar.FRIDAY,
-            R.id.chipSaturday to Calendar.SATURDAY
-        )
-    }
+    private fun setupCalendarControls() {
+        rgScheduleType.setOnCheckedChangeListener { _, checkedId ->
+            scheduleType = if (checkedId == R.id.rbSelectedDates) {
+                MedicineSchedule.SELECTED_DATES
+            } else {
+                MedicineSchedule.DATE_RANGE
+            }
 
-    private fun setupWeekdayChips() {
-        getWeekdayChips().forEach { (viewId, day) ->
+            updateScheduleVisibility()
+        }
 
-            val chip = findViewById<TextView>(viewId)
-
-            chip.setOnClickListener {
-                if (selectedWeekdays.contains(day)) {
-                    selectedWeekdays.remove(day)
-                } else {
-                    selectedWeekdays.add(day)
-                }
-
-                // Always render from the current selection state.
-                refreshWeekdayChips()
+        btnStartDate.setOnClickListener {
+            showDatePicker(startDate ?: todayString()) { date ->
+                startDate = date
+                updateDateButtonLabels()
             }
         }
 
-        refreshWeekdayChips()
-    }
-
-    private fun refreshWeekdayChips() {
-        getWeekdayChips().forEach { (viewId, day) ->
-            val chip = findViewById<TextView>(viewId)
-
-            updateWeekdayChip(
-                chip = chip,
-                isSelected = selectedWeekdays.contains(day)
-            )
+        btnEndDate.setOnClickListener {
+            showDatePicker(endDate ?: startDate ?: todayString()) { date ->
+                endDate = date
+                updateDateButtonLabels()
+            }
         }
+
+        btnAddSelectedDate.setOnClickListener {
+            showDatePicker(todayString()) { date ->
+                selectedDates.add(date)
+                refreshSelectedDatesText()
+            }
+        }
+
+        updateScheduleVisibility()
+        updateDateButtonLabels()
     }
 
-    private fun updateWeekdayChip(
-        chip: TextView,
-        isSelected: Boolean
+    private fun updateScheduleVisibility() {
+        val isRange = scheduleType == MedicineSchedule.DATE_RANGE
+
+        btnStartDate.visibility =
+            if (isRange) View.VISIBLE else View.GONE
+
+        btnEndDate.visibility =
+            if (isRange) View.VISIBLE else View.GONE
+
+        btnAddSelectedDate.visibility =
+            if (isRange) View.GONE else View.VISIBLE
+
+        tvSelectedDates.visibility =
+            if (isRange) View.GONE else View.VISIBLE
+    }
+
+    private fun showDatePicker(
+        initialDate: String,
+        onSelected: (String) -> Unit
     ) {
-        // Create the appearance directly so reversed XML drawable
-        // definitions cannot reverse the selected state.
+        val calendar = parseCalendarDate(initialDate)
+            ?: Calendar.getInstance()
 
-        val background = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = dpToPx(12).toFloat()
-
-            if (isSelected) {
-                // SELECTED: highlighted lavender background.
-                setColor(Color.parseColor("#E8E0F2"))
-                setStroke(
-                    dpToPx(1),
-                    Color.parseColor("#B7A0D8")
-                )
-            } else {
-                // UNSELECTED: transparent background.
-                setColor(Color.TRANSPARENT)
-                setStroke(0, Color.TRANSPARENT)
-            }
-        }
-
-        chip.background = background
-
-        chip.setTextColor(
-            if (isSelected) {
-                Color.parseColor("#29213A")
-            } else {
-                Color.parseColor("#29213A")
-            }
-        )
-
-        chip.gravity = Gravity.CENTER
-        chip.isSelected = isSelected
-
-        chip.animate()
-            .scaleX(if (isSelected) 1.03f else 1f)
-            .scaleY(if (isSelected) 1.03f else 1f)
-            .setDuration(100)
-            .start()
-    }
-
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
-    }
-
-    private fun getSelectedWeekdaysString(): String {
-        return selectedWeekdays
-            .sorted()
-            .joinToString(",")
-    }
-
-    private fun setSelectedWeekdays(weekdays: String?) {
-        selectedWeekdays.clear()
-
-        if (weekdays.isNullOrBlank()) {
-            // Preserve the existing behavior for medicines without
-            // a saved weekday value: select every day.
-            selectedWeekdays.addAll(
-                listOf(
-                    Calendar.SUNDAY,
-                    Calendar.MONDAY,
-                    Calendar.TUESDAY,
-                    Calendar.WEDNESDAY,
-                    Calendar.THURSDAY,
-                    Calendar.FRIDAY,
-                    Calendar.SATURDAY
-                )
-            )
-        } else {
-            weekdays.split(",")
-                .mapNotNull { it.trim().toIntOrNull() }
-                .filter {
-                    it in Calendar.SUNDAY..Calendar.SATURDAY
+        DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+                val selected = Calendar.getInstance().apply {
+                    set(Calendar.YEAR, year)
+                    set(Calendar.MONTH, month)
+                    set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
                 }
-                .forEach { selectedWeekdays.add(it) }
-        }
 
-        refreshWeekdayChips()
+                onSelected(MedicineSchedule.formatDate(selected))
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
     }
 
-    // ---------------------------------------------------------
-    // REMINDER TIMES
-    // ---------------------------------------------------------
+    private fun todayString(): String {
+        return MedicineSchedule.formatDate(Calendar.getInstance())
+    }
+
+    private fun parseCalendarDate(value: String): Calendar? {
+        return try {
+            val date = dateFormat.parse(value) ?: return null
+
+            Calendar.getInstance().apply {
+                time = date
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun updateDateButtonLabels() {
+        btnStartDate.text = startDate?.let {
+            "Start date: $it"
+        } ?: "Choose start date"
+
+        btnEndDate.text = endDate?.let {
+            "End date: $it"
+        } ?: "Choose end date"
+    }
+
+    private fun refreshSelectedDatesText() {
+        tvSelectedDates.text = if (selectedDates.isEmpty()) {
+            "No individual dates selected"
+        } else {
+            selectedDates.joinToString("\n") { date ->
+                "• $date"
+            }
+        }
+    }
+
+    private fun validateSchedule(): Boolean {
+        if (scheduleType == MedicineSchedule.DATE_RANGE) {
+            val start = startDate
+            val end = endDate
+
+            if (start == null || end == null) {
+                showToast("Please choose both start and end dates")
+                return false
+            }
+
+            if (start > end) {
+                showToast("End date must be on or after start date")
+                return false
+            }
+
+            if (end < todayString()) {
+                showToast("Please choose a future or current date range")
+                return false
+            }
+        } else {
+            if (selectedDates.isEmpty()) {
+                showToast("Please select at least one calendar date")
+                return false
+            }
+
+            if (selectedDates.none { it >= todayString() }) {
+                showToast("Select at least one current or future date")
+                return false
+            }
+        }
+
+        return true
+    }
+
+    // ---------------- REMINDER TIMES ----------------
 
     private fun showTimePicker() {
         val now = Calendar.getInstance()
@@ -302,25 +351,16 @@ class AddMedicineActivity : AppCompatActivity() {
         TimePickerDialog(
             this,
             { _, hour, minute ->
-
-                val alreadyExists = reminderTimes.any {
+                val duplicate = reminderTimes.any {
                     it.hour == hour && it.minute == minute
                 }
 
-                if (alreadyExists) {
-                    Toast.makeText(
-                        this,
-                        "This reminder time is already added",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                if (duplicate) {
+                    showToast("This reminder time is already added")
                     return@TimePickerDialog
                 }
 
-                reminderTimes.add(
-                    ReminderTime(hour, minute)
-                )
-
+                reminderTimes.add(ReminderTime(hour, minute))
                 reminderTimes.sortWith(
                     compareBy<ReminderTime> { it.hour }
                         .thenBy { it.minute }
@@ -335,62 +375,29 @@ class AddMedicineActivity : AppCompatActivity() {
     }
 
     private fun displayReminderTimes() {
-        if (reminderTimes.isEmpty()) {
-            tvSelectedTimes.text = "No reminder times added"
-            return
-        }
-
-        val formatter = SimpleDateFormat(
-            "hh:mm a",
-            Locale.getDefault()
-        )
-
-        tvSelectedTimes.text = reminderTimes.joinToString("\n") { time ->
-            val calendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, time.hour)
-                set(Calendar.MINUTE, time.minute)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
-
-            "• ${formatter.format(calendar.time)}"
-        }
-    }
-
-    // ---------------------------------------------------------
-    // CAMERA
-    // ---------------------------------------------------------
-
-    private fun checkCameraPermission() {
-        if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestCameraPermission.launch(
-                Manifest.permission.CAMERA
-            )
+        tvSelectedTimes.text = if (reminderTimes.isEmpty()) {
+            "No reminder times added"
         } else {
-            openCamera()
+            reminderTimes.joinToString("\n") { time ->
+                val calendar = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, time.hour)
+                    set(Calendar.MINUTE, time.minute)
+                }
+
+                SimpleDateFormat("hh:mm a", Locale.getDefault())
+                    .format(calendar.time)
+            }
         }
     }
+
+    // ---------------- MEDICINE PHOTO ----------------
 
     private fun openCamera() {
         try {
-            val imageDirectory = File(
-                filesDir,
-                "medicine_images"
-            )
+            val imageDirectory = File(filesDir, "medicine_images")
 
-            if (
-                !imageDirectory.exists() &&
-                !imageDirectory.mkdirs()
-            ) {
-                throw IllegalStateException(
-                    "Unable to create image directory"
-                )
+            if (!imageDirectory.exists()) {
+                imageDirectory.mkdirs()
             }
 
             photoFile = File(
@@ -398,111 +405,196 @@ class AddMedicineActivity : AppCompatActivity() {
                 "medicine_${System.currentTimeMillis()}.jpg"
             )
 
-            val photoUri = FileProvider.getUriForFile(
+            val imageUri: Uri = FileProvider.getUriForFile(
                 this,
                 "$packageName.fileprovider",
                 photoFile!!
             )
 
-            takePictureLauncher.launch(photoUri)
-
+            takePictureLauncher.launch(imageUri)
         } catch (e: Exception) {
-            photoFile?.delete()
-            photoFile = null
-
-            Toast.makeText(
-                this,
-                "Unable to open camera: ${e.message}",
-                Toast.LENGTH_LONG
-            ).show()
+            android.util.Log.e(
+                "AddMedicineActivity",
+                "Could not open camera",
+                e
+            )
+            showToast("Unable to open camera")
         }
     }
 
-    // ---------------------------------------------------------
-    // LOAD MEDICINE FOR EDITING
-    // ---------------------------------------------------------
+    private fun displayMedicineImage(path: String?) {
+        if (path.isNullOrBlank()) {
+            ivMedicinePreview.setImageResource(
+                android.R.drawable.ic_menu_gallery
+            )
+            return
+        }
+
+        val file = File(path)
+
+        if (!file.exists()) {
+            ivMedicinePreview.setImageResource(
+                android.R.drawable.ic_menu_gallery
+            )
+            return
+        }
+
+        val bitmap = BitmapFactory.decodeFile(path)
+
+        if (bitmap != null) {
+            ivMedicinePreview.setImageBitmap(bitmap)
+        } else {
+            ivMedicinePreview.setImageResource(
+                android.R.drawable.ic_menu_gallery
+            )
+        }
+    }
+
+    // ---------------- STOCK INPUTS ----------------
+
+    private fun setStockInputsEnabled(enabled: Boolean) {
+        etInitialStock.isEnabled = enabled
+        etUnitsPerDose.isEnabled = enabled
+        etStockUnit.isEnabled = enabled
+    }
+
+    private fun readStockInputs(): StockInputs? {
+        val stockText = etInitialStock.text.toString().trim()
+        val unitsText = etUnitsPerDose.text.toString().trim()
+        val unit = etStockUnit.text.toString().trim()
+            .ifBlank { "tablets" }
+
+        if (stockText.isBlank() && unitsText.isBlank()) {
+            return StockInputs(
+                currentStock = null,
+                unitsPerDose = null,
+                stockUnit = unit
+            )
+        }
+
+        if (stockText.isBlank() || unitsText.isBlank()) {
+            showToast("Enter both initial stock and units per dose")
+            return null
+        }
+
+        val stock = stockText.toDoubleOrNull()
+        val units = unitsText.toDoubleOrNull()
+
+        if (stock == null || !stock.isFinite() || stock < 0.0) {
+            showToast("Enter a valid non-negative stock quantity")
+            return null
+        }
+
+        if (units == null || !units.isFinite() || units <= 0.0) {
+            showToast("Units per dose must be greater than zero")
+            return null
+        }
+
+        return StockInputs(
+            currentStock = stock,
+            unitsPerDose = units,
+            stockUnit = unit
+        )
+    }
+
+    // ---------------- LOAD EXISTING MEDICINE ----------------
 
     private fun loadMedicineForEditing(id: Int) {
         lifecycleScope.launch {
             try {
-                val relation = withContext(Dispatchers.IO) {
+                val item = withContext(Dispatchers.IO) {
                     dao.getMedicineWithTimes(id)
                 }
 
-                if (relation == null) {
-                    Toast.makeText(
-                        this@AddMedicineActivity,
-                        "Medicine not found",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                if (item == null) {
+                    showToast("Medicine not found")
                     finish()
                     return@launch
                 }
 
-                val medicine = relation.medicine
+                val medicine = item.medicine
 
                 etMedicineName.setText(medicine.name)
                 etDosage.setText(medicine.dosage)
                 etMedicineNotes.setText(medicine.notes.orEmpty())
 
                 medicineImagePath = medicine.imagePath
+                displayMedicineImage(medicineImagePath)
 
-                if (!medicine.imagePath.isNullOrBlank()) {
-                    val imageFile = File(medicine.imagePath)
+                scheduleType = when (medicine.scheduleType) {
+                    MedicineSchedule.SELECTED_DATES ->
+                        MedicineSchedule.SELECTED_DATES
 
-                    if (imageFile.exists()) {
-                        ivMedicinePreview.setImageURI(
-                            Uri.fromFile(imageFile)
-                        )
-                    }
+                    else -> MedicineSchedule.DATE_RANGE
                 }
 
-                setSelectedWeekdays(medicine.weekdays)
+                startDate = medicine.startDate
+                endDate = medicine.endDate
+
+                selectedDates.clear()
+                selectedDates.addAll(
+                    withContext(Dispatchers.IO) {
+                        dao.getScheduledDateStrings(id)
+                    }
+                )
+
+                rgScheduleType.check(
+                    if (scheduleType == MedicineSchedule.SELECTED_DATES) {
+                        R.id.rbSelectedDates
+                    } else {
+                        R.id.rbDateRange
+                    }
+                )
+
+                updateScheduleVisibility()
+                updateDateButtonLabels()
+                refreshSelectedDatesText()
 
                 reminderTimes.clear()
-
-                relation.reminderTimes.forEach { time ->
-                    reminderTimes.add(
-                        ReminderTime(
-                            hour = time.hour,
-                            minute = time.minute
-                        )
-                    )
-                }
-
+                reminderTimes.addAll(
+                    item.reminderTimes.map {
+                        ReminderTime(it.hour, it.minute)
+                    }
+                )
                 reminderTimes.sortWith(
                     compareBy<ReminderTime> { it.hour }
                         .thenBy { it.minute }
                 )
-
                 displayReminderTimes()
 
+                etInitialStock.setText(
+                    medicine.currentStock?.toString().orEmpty()
+                )
+                etUnitsPerDose.setText(
+                    medicine.unitsPerDose?.toString().orEmpty()
+                )
+                etStockUnit.setText(medicine.stockUnit)
+
+                // Preserve existing stock while editing this medicine.
+                setStockInputsEnabled(false)
+
             } catch (e: Exception) {
-                Toast.makeText(
-                    this@AddMedicineActivity,
-                    "Unable to load medicine: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                android.util.Log.e(
+                    "AddMedicineActivity",
+                    "Failed to load medicine",
+                    e
+                )
+                showToast("Unable to load medicine details")
             }
         }
     }
 
-    // ---------------------------------------------------------
-    // SAVE OR UPDATE MEDICINE AND SCHEDULE REMINDERS
-    // ---------------------------------------------------------
+    // ---------------- SAVE / UPDATE ----------------
 
     private fun saveMedicine() {
         if (isSaving) return
 
-        val medicineName = etMedicineName.text.toString().trim()
+        val name = etMedicineName.text.toString().trim()
         val dosage = etDosage.text.toString().trim()
-
-        val notes = etMedicineNotes.text.toString()
-            .trim()
+        val notes = etMedicineNotes.text.toString().trim()
             .ifBlank { null }
 
-        if (medicineName.isBlank()) {
+        if (name.isBlank()) {
             etMedicineName.error = "Enter medicine name"
             etMedicineName.requestFocus()
             return
@@ -514,134 +606,192 @@ class AddMedicineActivity : AppCompatActivity() {
             return
         }
 
-        if (selectedWeekdays.isEmpty()) {
-            Toast.makeText(
-                this,
-                "Select at least one weekday",
-                Toast.LENGTH_SHORT
-            ).show()
+        if (reminderTimes.isEmpty()) {
+            showToast("Add at least one reminder time")
             return
         }
 
-        if (reminderTimes.isEmpty()) {
-            Toast.makeText(
-                this,
-                "Add at least one reminder time",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
+        if (!validateSchedule()) return
+
+        val stockInputs = if (isEditMode) {
+            null
+        } else {
+            readStockInputs() ?: return
         }
 
         isSaving = true
         btnSaveMedicine.isEnabled = false
 
-        val weekdaysString = getSelectedWeekdaysString()
-        val isNewMedicine = medicineId == 0
-
-        // Take a snapshot so the data used for saving is consistent.
-        val timesToSave = reminderTimes.toList()
-
         lifecycleScope.launch {
             try {
-                val savedMedicineId = withContext(Dispatchers.IO) {
-
-                    if (isNewMedicine) {
-                        val medicine = Medicine(
-                            name = medicineName,
+                withContext(Dispatchers.IO) {
+                    if (isEditMode) {
+                        updateExistingMedicine(
+                            name = name,
                             dosage = dosage,
-                            imagePath = medicineImagePath,
-                            notes = notes,
-                            weekdays = weekdaysString
+                            notes = notes
                         )
-
-                        dao.insertMedicine(medicine).toInt()
-
                     } else {
-                        // Read old reminder IDs before deleting their records.
-                        val oldRelation =
-                            dao.getMedicineWithTimes(medicineId)
+                        insertNewMedicine(
+                            name = name,
+                            dosage = dosage,
+                            notes = notes,
+                            stockInputs = stockInputs!!
+                        )
+                    }
+                }
 
-                        // Cancel existing alarms before replacing times.
-                        oldRelation?.reminderTimes?.forEach { oldTime ->
+                // Update alarms after the medicine and its times have been saved.
+                val savedItem = withContext(Dispatchers.IO) {
+                    dao.getMedicineWithTimes(medicineId)
+                }
+
+                if (savedItem != null) {
+                    savedItem.reminderTimes.forEach { time ->
+                        if (time.isEnabled) {
+                            ReminderScheduler.scheduleReminder(
+                                this@AddMedicineActivity,
+                                time,
+                                savedItem.medicine.name,
+                                savedItem.medicine.dosage
+                            )
+                        } else {
                             ReminderScheduler.cancelReminder(
                                 this@AddMedicineActivity,
-                                oldTime.id
-                            )
-
-                            ReminderScheduler.cancelSnooze(
-                                this@AddMedicineActivity,
-                                oldTime.id
-                            )
-                        }
-
-                        val medicine = Medicine(
-                            id = medicineId,
-                            name = medicineName,
-                            dosage = dosage,
-                            imagePath = medicineImagePath,
-                            notes = notes,
-                            weekdays = weekdaysString
-                        )
-
-                        dao.updateMedicine(medicine)
-                        dao.deleteMedicineTimesForMedicine(medicineId)
-
-                        medicineId
-                    }.also { savedId ->
-
-                        timesToSave.forEach { time ->
-                            dao.insertMedicineTime(
-                                MedicineTime(
-                                    medicineId = savedId,
-                                    hour = time.hour,
-                                    minute = time.minute
-                                )
+                                time.id
                             )
                         }
                     }
                 }
 
-                // Load the persisted records to get their real database IDs.
-                val savedRelation = withContext(Dispatchers.IO) {
-                    dao.getMedicineWithTimes(savedMedicineId)
-                } ?: throw IllegalStateException(
-                    "Saved medicine could not be loaded"
+                LowStockWorkScheduler.checkNow(applicationContext)
+
+                showToast(
+                    if (isEditMode) {
+                        "Medicine updated successfully"
+                    } else {
+                        "Medicine saved successfully"
+                    }
                 )
 
-                // Schedule each reminder using the saved weekday selection.
-                savedRelation.reminderTimes.forEach { time ->
-                    ReminderScheduler.scheduleReminder(
-                        this@AddMedicineActivity,
-                        time,
-                        savedRelation.medicine.name,
-                        savedRelation.medicine.dosage,
-                        savedRelation.medicine.weekdays
-                    )
-                }
-
-                Toast.makeText(
-                    this@AddMedicineActivity,
-                    if (isNewMedicine) {
-                        "Medicine saved successfully"
-                    } else {
-                        "Medicine updated successfully"
-                    },
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                setResult(Activity.RESULT_OK)
+                setResult(RESULT_OK)
                 finish()
 
             } catch (e: Exception) {
-                Toast.makeText(
-                    this@AddMedicineActivity,
-                    "Unable to save medicine: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-
+                android.util.Log.e(
+                    "AddMedicineActivity",
+                    "Could not save medicine",
+                    e
+                )
+                showToast("Could not save medicine: ${e.message ?: "unknown error"}")
+            } finally {
                 isSaving = false
                 btnSaveMedicine.isEnabled = true
             }
         }
+    }
+
+    private suspend fun insertNewMedicine(
+        name: String,
+        dosage: String,
+        notes: String?,
+        stockInputs: StockInputs
+    ) {
+        val medicine = Medicine(
+            name = name,
+            dosage = dosage,
+            imagePath = medicineImagePath,
+            notes = notes,
+            weekdays = "1,2,3,4,5,6,7",
+            scheduleType = scheduleType,
+            startDate = if (
+                scheduleType == MedicineSchedule.DATE_RANGE
+            ) startDate else null,
+            endDate = if (
+                scheduleType == MedicineSchedule.DATE_RANGE
+            ) endDate else null,
+            currentStock = stockInputs.currentStock,
+            unitsPerDose = stockInputs.unitsPerDose,
+            stockUnit = stockInputs.stockUnit,
+            lowStockDays = 3
+        )
+
+        medicineId = dao.insertMedicine(medicine).toInt()
+
+        saveSelectedDates()
+        saveReminderTimes()
+    }
+
+    private suspend fun updateExistingMedicine(
+        name: String,
+        dosage: String,
+        notes: String?
+    ) {
+        val oldItem = dao.getMedicineWithTimes(medicineId)
+            ?: throw IllegalStateException("Medicine no longer exists")
+
+        // Cancel alarms and snoozes before replacing their reminder times.
+        oldItem.reminderTimes.forEach { time ->
+            ReminderScheduler.cancelReminder(this, time.id)
+            ReminderScheduler.cancelSnooze(this, time.id)
+        }
+
+        val updatedMedicine = oldItem.medicine.copy(
+            name = name,
+            dosage = dosage,
+            imagePath = medicineImagePath,
+            notes = notes,
+            scheduleType = scheduleType,
+            startDate = if (
+                scheduleType == MedicineSchedule.DATE_RANGE
+            ) startDate else null,
+            endDate = if (
+                scheduleType == MedicineSchedule.DATE_RANGE
+            ) endDate else null
+        )
+
+        dao.updateMedicine(updatedMedicine)
+
+        dao.deleteMedicineTimesForMedicine(medicineId)
+        saveSelectedDates()
+        saveReminderTimes()
+    }
+
+    private suspend fun saveSelectedDates() {
+        dao.deleteScheduledDates(medicineId)
+
+        if (scheduleType == MedicineSchedule.SELECTED_DATES) {
+            val dateEntities = selectedDates.map { date ->
+                MedicineScheduledDate(
+                    medicineId = medicineId,
+                    date = date
+                )
+            }
+
+            if (dateEntities.isNotEmpty()) {
+                dao.insertScheduledDates(dateEntities)
+            }
+        }
+    }
+
+    private suspend fun saveReminderTimes() {
+        reminderTimes.forEach { time ->
+            dao.insertMedicineTime(
+                MedicineTime(
+                    medicineId = medicineId,
+                    hour = time.hour,
+                    minute = time.minute,
+                    isEnabled = true
+                )
+            )
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(
+            this,
+            message,
+            Toast.LENGTH_LONG
+        ).show()
     }
 }

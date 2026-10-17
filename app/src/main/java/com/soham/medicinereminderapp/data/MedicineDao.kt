@@ -126,18 +126,59 @@ interface MedicineDao {
     @Query("SELECT * FROM dose_logs WHERE id = :logId LIMIT 1")
     suspend fun getDoseLogById(logId: Int): DoseLog?
 
-    @Query(
-        """
-        UPDATE dose_logs
-        SET status = 'TAKEN', takenTime = :takenTime
-        WHERE id = :logId
-        """
-    )
+    @Query("""
+    UPDATE dose_logs
+    SET status = 'TAKEN',
+        takenTime = :takenTime
+    WHERE id = :logId
+      AND status = 'PENDING'
+""")
     suspend fun markDoseAsTaken(
         logId: Int,
         takenTime: Long
+    ): Int
+    @Query(
+        """
+    UPDATE medicines
+    SET currentStock = currentStock - :unitsToDeduct
+    WHERE id = :medicineId
+      AND currentStock IS NOT NULL
+    """
     )
+    suspend fun deductMedicineStock(
+        medicineId: Int,
+        unitsToDeduct: Double
+    ): Int
 
+    @Transaction
+    suspend fun markDoseAsTakenAndDeductStock(
+        logId: Int,
+        takenTime: Long
+    ): Boolean {
+        val doseLog = getDoseLogById(logId) ?: return false
+
+        // Do not deduct stock twice for the same dose.
+        if (doseLog.status != "PENDING") return false
+
+        val updatedRows = markDoseAsTaken(logId, takenTime)
+        if (updatedRows != 1) return false
+
+        val medicineId = doseLog.medicineId ?: return true
+        val medicine = getMedicineById(medicineId) ?: return true
+
+        val stock = medicine.currentStock ?: return true
+        val unitsPerDose = medicine.unitsPerDose ?: return true
+
+        // Invalid or unconfigured stock quantities are not deducted.
+        if (unitsPerDose <= 0.0) return true
+
+        deductMedicineStock(
+            medicineId = medicineId,
+            unitsToDeduct = unitsPerDose
+        )
+
+        return true
+    }
     @Query(
         """
         UPDATE dose_logs
@@ -182,4 +223,48 @@ interface MedicineDao {
         startOfDay: Long,
         endOfDay: Long
     ): Flow<List<DoseLog>>
+    @Query(
+        """
+    UPDATE medicines
+    SET currentStock = currentStock + :quantityToAdd,
+        lowStockAlertActive = 0
+    WHERE id = :medicineId
+      AND currentStock IS NOT NULL
+      AND :quantityToAdd > 0
+    """
+    )
+    suspend fun addMedicineStock(
+        medicineId: Int,
+        quantityToAdd: Double
+    ): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertScheduledDates(
+        dates: List<MedicineScheduledDate>
+    )
+
+    @Query("""
+    DELETE FROM medicine_scheduled_dates
+    WHERE medicineId = :medicineId
+""")
+    suspend fun deleteScheduledDates(medicineId: Int)
+
+    @Query("""
+    SELECT * FROM medicine_scheduled_dates
+    WHERE medicineId = :medicineId
+    ORDER BY date ASC
+""")
+    suspend fun getScheduledDates(
+        medicineId: Int
+    ): List<MedicineScheduledDate>
+
+    @Query("""
+    SELECT date FROM medicine_scheduled_dates
+    WHERE medicineId = :medicineId
+    ORDER BY date ASC
+""")
+    suspend fun getScheduledDateStrings(
+        medicineId: Int
+    ): List<String>
+
 }

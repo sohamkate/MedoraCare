@@ -4,6 +4,7 @@ package com.soham.medicinereminderapp.repository
 import com.soham.medicinereminderapp.data.DoseLog
 import com.soham.medicinereminderapp.data.Medicine
 import com.soham.medicinereminderapp.data.MedicineDao
+import com.soham.medicinereminderapp.data.MedicineScheduledDate
 import com.soham.medicinereminderapp.data.MedicineTime
 import com.soham.medicinereminderapp.data.MedicineWithTimes
 import kotlinx.coroutines.flow.Flow
@@ -96,17 +97,56 @@ class MedicineRepository(private val dao: MedicineDao) {
     suspend fun markDoseAsTaken(
         logId: Int,
         takenTime: Long = System.currentTimeMillis()
-    ) = dao.markDoseAsTaken(logId, takenTime)
-
+    ): Boolean =
+        dao.markDoseAsTakenAndDeductStock(logId, takenTime)
     suspend fun markDoseAsNotTaken(logId: Int) =
         dao.markDoseAsNotTaken(logId)
 
     suspend fun markDoseAsMissed(logId: Int) =
         dao.markDoseAsMissed(logId)
+    suspend fun addMedicineStock(
+        medicineId: Int,
+        quantityToAdd: Double
+    ): Boolean {
+        if (!quantityToAdd.isFinite() || quantityToAdd <= 0.0) {
+            return false
+        }
 
+        return dao.addMedicineStock(
+            medicineId,
+            quantityToAdd
+        ) == 1
+    }
     fun getDoseLogsForDay(
         startOfDay: Long,
         endOfDay: Long
     ): Flow<List<DoseLog>> =
         dao.getDoseLogsForDay(startOfDay, endOfDay)
+
+    suspend fun saveScheduledDates(
+        medicineId: Int,
+        dates: List<String>
+    ) {
+        dao.deleteScheduledDates(medicineId)
+
+        val uniqueDates = dates.distinct().sorted()
+
+        if (uniqueDates.isNotEmpty()) {
+            dao.insertScheduledDates(
+                uniqueDates.map { date ->
+                    MedicineScheduledDate(
+                        medicineId = medicineId,
+                        date = date
+                    )
+                }
+            )
+        }
+    }
+
+    suspend fun getScheduledDates(
+        medicineId: Int
+    ): List<String> {
+        return dao.getScheduledDateStrings(medicineId)
+    }
+
 }

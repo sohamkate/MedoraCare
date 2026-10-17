@@ -10,41 +10,46 @@ import androidx.core.app.NotificationManagerCompat
 class SnoozeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val timeId = intent.getIntExtra("medicineTimeId", -1)
-        val medicineId = intent.getIntExtra("medicineId", -1)
+        val medicineTimeId =
+            intent.getIntExtra("medicineTimeId", -1)
+
+        val medicineId =
+            intent.getIntExtra("medicineId", -1)
+
         val medicineName =
             intent.getStringExtra("medicineName") ?: "Your medicine"
-        val dosage = intent.getStringExtra("dosage") ?: ""
 
-        if (timeId < 1 || medicineId < 1) {
-            Log.e("SnoozeReceiver", "Invalid reminder information")
+        val dosage =
+            intent.getStringExtra("dosage") ?: ""
+
+        val scheduledTime =
+            intent.getLongExtra("scheduledTime", 0L)
+
+        if (medicineTimeId < 1 || medicineId < 1) {
+            Log.e(
+                "SnoozeReceiver",
+                "Invalid reminder information"
+            )
             return
         }
 
-        // Dismiss the currently visible reminder.
-        NotificationManagerCompat.from(context).cancel(timeId)
+        // Dismiss the currently visible notification.
+        NotificationManagerCompat.from(context)
+            .cancel(medicineTimeId)
 
+        // Schedule the reminder once, five minutes from now.
         ReminderScheduler.scheduleSnooze(
             context = context,
-            timeId = timeId,
+            medicineTimeId = medicineTimeId,
             medicineId = medicineId,
             medicineName = medicineName,
-            dosage = dosage
+            dosage = dosage,
+            scheduledTime = scheduledTime.takeIf { it > 0L }
         )
 
         Log.d(
             "SnoozeReceiver",
             "$medicineName snoozed for five minutes"
-        )
-        val scheduledTime = intent.getLongExtra("scheduledTime", 0L)
-
-        ReminderScheduler.scheduleSnooze(
-            context = context,
-            timeId = timeId,
-            medicineId = medicineId,
-            medicineName = medicineName,
-            dosage = dosage,
-            scheduledTime = scheduledTime
         )
     }
 }

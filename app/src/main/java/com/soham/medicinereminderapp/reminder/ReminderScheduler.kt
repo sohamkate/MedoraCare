@@ -7,11 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
+import com.soham.medicinereminderapp.data.AppDatabase
 import com.soham.medicinereminderapp.data.MedicineTime
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object ReminderScheduler {
 
@@ -25,50 +24,56 @@ object ReminderScheduler {
 
     private const val SNOOZE_REQUEST_CODE_OFFSET = 100000
 
-    private const val ALL_DAYS = "1,2,3,4,5,6,7"
-
-    fun scheduleReminder(
+    suspend fun scheduleReminder(
         context: Context,
         medicineTime: MedicineTime,
         medicineName: String,
-        dosage: String,
-        weekdays: String = ALL_DAYS
-    ) {
-        if (!medicineTime.isEnabled) {
-            Log.d(TAG, "Reminder ${medicineTime.id} is disabled")
-            cancelReminder(context, medicineTime.id)
-            return
-        }
+        dosage: String
+    ) = withContext(Dispatchers.IO) {
 
         val appContext = context.applicationContext
-        val alarmManager = appContext.getSystemService(
-            Context.ALARM_SERVICE
-        ) as AlarmManager
+        val dao = AppDatabase.getDatabase(appContext).medicineDao()
 
-        val selectedDays = weekdays.split(",")
-            .mapNotNull { it.trim().toIntOrNull() }
-            .filter { it in Calendar.SUNDAY..Calendar.SATURDAY }
-            .toSet()
-
-        if (selectedDays.isEmpty()) {
-            Log.e(TAG, "No valid weekdays for ${medicineTime.id}")
+        if (!medicineTime.isEnabled) {
             cancelReminder(appContext, medicineTime.id)
-            return
+            cancelSnooze(appContext, medicineTime.id)
+            return@withContext
         }
 
-        val triggerAt = nextOccurrence(
-            medicineTime.hour,
-            medicineTime.minute,
-            selectedDays
+        val medicine = dao.getMedicineById(medicineTime.medicineId)
+            ?: return@withContext
+
+        val selectedDates = if (
+            medicine.scheduleType == MedicineSchedule.SELECTED_DATES
+        ) {
+            dao.getScheduledDateStrings(medicine.id).toSet()
+        } else {
+            emptySet()
+        }
+
+        val triggerAt = MedicineSchedule.nextOccurrence(
+            hour = medicineTime.hour,
+            minute = medicineTime.minute,
+            scheduleType = medicine.scheduleType,
+            startDate = medicine.startDate,
+            endDate = medicine.endDate,
+            selectedDates = selectedDates
         )
+
+        if (triggerAt == null) {
+            cancelReminder(appContext, medicineTime.id)
+            Log.d(TAG, "No future eligible date for ${medicine.name}")
+            return@withContext
+        }
 
         val intent = Intent(
             appContext,
             ReminderReceiver::class.java
         ).apply {
             action = ACTION_MEDICINE_REMINDER
+
             putExtra("medicineTimeId", medicineTime.id)
-            putExtra("medicineId", medicineTime.medicineId)
+            putExtra("medicineId", medicine.id)
             putExtra("medicineName", medicineName)
             putExtra("dosage", dosage)
             putExtra("hour", medicineTime.hour)
@@ -84,125 +89,50 @@ object ReminderScheduler {
                     PendingIntent.FLAG_IMMUTABLE
         )
 
+        scheduleAlarm(appContext, triggerAt, pendingIntent)
+
         Log.d(
             TAG,
-            "Reminder ${medicineTime.id} scheduled for ${
-                SimpleDateFormat(
-                    "EEE yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
-                ).format(Date(triggerAt))
-            }"
+            "Scheduled ${medicine.name} for $triggerAt"
         )
-
-        scheduleAlarm(alarmManager, triggerAt, pendingIntent)
-    }
-
-    private fun nextOccurrence(
-        hour: Int,
-        minute: Int,
-        selectedDays: Set<Int>
-    ): Long {
-        val now = Calendar.getInstance()
-
-        for (dayOffset in 0..7) {
-            val candidate = now.clone() as Calendar
-
-            candidate.add(Calendar.DAY_OF_YEAR, dayOffset)
-            candidate.set(Calendar.HOUR_OF_DAY, hour)
-            candidate.set(Calendar.MINUTE, minute)
-            candidate.set(Calendar.SECOND, 0)
-            candidate.set(Calendar.MILLISECOND, 0)
-
-            val isSelectedDay =
-                candidate.get(Calendar.DAY_OF_WEEK) in selectedDays
-
-            if (isSelectedDay &&
-                candidate.timeInMillis > now.timeInMillis
-            ) {
-                return candidate.timeInMillis
-            }
-        }
-
-        // A valid non-empty weekday set should always return above.
-        throw IllegalStateException("Unable to calculate next reminder")
     }
 
     fun scheduleSnooze(
         context: Context,
-        timeId: Int,
+        medicineTimeId: Int,
         medicineId: Int,
         medicineName: String,
         dosage: String,
-        scheduledTime: Long = 0L
+        scheduledTime: Long? = null
     ) {
-        if (timeId < 1 || medicineId < 1) return
-
         val appContext = context.applicationContext
-        val alarmManager = appContext.getSystemService(
-            Context.ALARM_SERVICE
-        ) as AlarmManager
+        val triggerAt = System.currentTimeMillis() + 5 * 60 * 1000L
 
         val intent = Intent(
             appContext,
             ReminderReceiver::class.java
         ).apply {
             action = ACTION_SNOOZED_REMINDER
-            putExtra("medicineTimeId", timeId)
+
+            putExtra("medicineTimeId", medicineTimeId)
             putExtra("medicineId", medicineId)
             putExtra("medicineName", medicineName)
             putExtra("dosage", dosage)
-
-            if (scheduledTime > 0L) {
-                putExtra("scheduledTime", scheduledTime)
-            }
+            putExtra(
+                "scheduledTime",
+                scheduledTime ?: triggerAt
+            )
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
             appContext,
-            SNOOZE_REQUEST_CODE_OFFSET + timeId,
+            medicineTimeId + SNOOZE_REQUEST_CODE_OFFSET,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or
                     PendingIntent.FLAG_IMMUTABLE
         )
 
-        val triggerAt = System.currentTimeMillis() + 5 * 60 * 1000L
-
-        scheduleAlarm(alarmManager, triggerAt, pendingIntent)
-
-        Log.d(TAG, "Snooze scheduled for $medicineName")
-    }
-
-    private fun scheduleAlarm(
-        alarmManager: AlarmManager,
-        triggerAtMillis: Long,
-        pendingIntent: PendingIntent
-    ) {
-        try {
-            if (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                !alarmManager.canScheduleExactAlarms()
-            ) {
-                alarmManager.setAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerAtMillis,
-                    pendingIntent
-                )
-            } else {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerAtMillis,
-                    pendingIntent
-                )
-            }
-        } catch (e: SecurityException) {
-            Log.e(TAG, "Exact alarm permission unavailable", e)
-
-            alarmManager.setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                triggerAtMillis,
-                pendingIntent
-            )
-        }
+        scheduleAlarm(appContext, triggerAt, pendingIntent)
     }
 
     fun cancelReminder(
@@ -210,9 +140,6 @@ object ReminderScheduler {
         medicineTimeId: Int
     ) {
         val appContext = context.applicationContext
-        val alarmManager = appContext.getSystemService(
-            Context.ALARM_SERVICE
-        ) as AlarmManager
 
         val intent = Intent(
             appContext,
@@ -225,12 +152,18 @@ object ReminderScheduler {
             appContext,
             medicineTimeId,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or
+            PendingIntent.FLAG_NO_CREATE or
                     PendingIntent.FLAG_IMMUTABLE
         )
 
-        alarmManager.cancel(pendingIntent)
-        pendingIntent.cancel()
+        pendingIntent?.let {
+            val alarmManager = appContext.getSystemService(
+                Context.ALARM_SERVICE
+            ) as AlarmManager
+
+            alarmManager.cancel(it)
+            it.cancel()
+        }
     }
 
     fun cancelSnooze(
@@ -238,9 +171,6 @@ object ReminderScheduler {
         medicineTimeId: Int
     ) {
         val appContext = context.applicationContext
-        val alarmManager = appContext.getSystemService(
-            Context.ALARM_SERVICE
-        ) as AlarmManager
 
         val intent = Intent(
             appContext,
@@ -251,13 +181,64 @@ object ReminderScheduler {
 
         val pendingIntent = PendingIntent.getBroadcast(
             appContext,
-            SNOOZE_REQUEST_CODE_OFFSET + medicineTimeId,
+            medicineTimeId + SNOOZE_REQUEST_CODE_OFFSET,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or
+            PendingIntent.FLAG_NO_CREATE or
                     PendingIntent.FLAG_IMMUTABLE
         )
 
-        alarmManager.cancel(pendingIntent)
-        pendingIntent.cancel()
+        pendingIntent?.let {
+            val alarmManager = appContext.getSystemService(
+                Context.ALARM_SERVICE
+            ) as AlarmManager
+
+            alarmManager.cancel(it)
+            it.cancel()
+        }
+    }
+
+    private fun scheduleAlarm(
+        context: Context,
+        triggerAt: Long,
+        pendingIntent: PendingIntent
+    ) {
+        val alarmManager = context.getSystemService(
+            Context.ALARM_SERVICE
+        ) as AlarmManager
+
+        try {
+            if (
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                !alarmManager.canScheduleExactAlarms()
+            ) {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                )
+            }
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Exact alarm scheduling failed", e)
+
+            try {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                )
+            } catch (fallbackException: Exception) {
+                Log.e(
+                    TAG,
+                    "Fallback alarm scheduling failed",
+                    fallbackException
+                )
+            }
+        }
     }
 }

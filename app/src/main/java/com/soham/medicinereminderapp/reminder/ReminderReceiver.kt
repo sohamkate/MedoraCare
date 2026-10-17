@@ -51,12 +51,14 @@ class ReminderReceiver : BroadcastReceiver() {
                 val dao =
                     AppDatabase.getDatabase(appContext).medicineDao()
 
+                // Confirm that the reminder still exists and is enabled.
                 val savedTime = dao.getMedicineTimeById(timeId)
                     ?: return@launch
 
                 if (!savedTime.isEnabled ||
                     savedTime.medicineId != medicineId
                 ) {
+                    Log.d(TAG, "Reminder is disabled or no longer valid")
                     return@launch
                 }
 
@@ -73,6 +75,8 @@ class ReminderReceiver : BroadcastReceiver() {
 
                 val reminderKey = "${timeId}_$scheduledTime"
 
+                // A normal reminder creates a pending dose record.
+                // Snoozing must not create a duplicate dose record.
                 if (!isSnoozed) {
                     dao.insertDoseLogIfAbsent(
                         DoseLog(
@@ -89,24 +93,24 @@ class ReminderReceiver : BroadcastReceiver() {
                 }
 
                 showNotification(
-                    appContext,
-                    timeId,
-                    medicineId,
-                    medicine.name,
-                    medicine.dosage,
-                    scheduledTime,
-                    isSnoozed
+                    context = appContext,
+                    timeId = timeId,
+                    medicineId = medicineId,
+                    medicineName = medicine.name,
+                    dosage = medicine.dosage,
+                    scheduledTime = scheduledTime,
+                    isSnoozed = isSnoozed
                 )
 
-                // Re-arm only the normal alarm. The scheduler reads
-                // the medicine's saved weekdays.
+                // Re-arm the next regular reminder.
+                // The scheduler must determine eligible dates from
+                // the medicine's saved calendar schedule.
                 if (!isSnoozed) {
                     ReminderScheduler.scheduleReminder(
-                        context = appContext,
-                        medicineTime = savedTime,
-                        medicineName = medicine.name,
-                        dosage = medicine.dosage,
-                        weekdays = medicine.weekdays
+                        appContext,
+                        savedTime,
+                        medicine.name,
+                        medicine.dosage
                     )
                 }
             } catch (e: Exception) {
@@ -147,6 +151,7 @@ class ReminderReceiver : BroadcastReceiver() {
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+            Log.w(TAG, "Notification permission not granted")
             return
         }
 
@@ -215,7 +220,11 @@ class ReminderReceiver : BroadcastReceiver() {
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setAutoCancel(true)
             .setContentIntent(contentIntent)
-            .addAction(0, "Snooze reminder", snoozePendingIntent)
+            .addAction(
+                0,
+                "Snooze reminder",
+                snoozePendingIntent
+            )
             .build()
 
         try {

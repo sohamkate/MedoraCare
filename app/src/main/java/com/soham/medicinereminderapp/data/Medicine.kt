@@ -1,3 +1,4 @@
+
 package com.soham.medicinereminderapp.data
 
 import androidx.room.Entity
@@ -13,7 +14,20 @@ data class Medicine(
     val imagePath: String? = null,
     val notes: String? = null,
 
-    // Calendar weekday numbers: Sunday = 1, Saturday = 7.
-    // Default: every day.
-    val weekdays: String = "1,2,3,4,5,6,7"
+    // Legacy field retained to preserve existing data.
+    val weekdays: String = "1,2,3,4,5,6,7",
+
+    // NEW: DATE_RANGE or SELECTED_DATES
+    val scheduleType: String = "DATE_RANGE",
+
+    // NEW: Inclusive date range, stored as yyyy-MM-dd.
+    val startDate: String? = null,
+    val endDate: String? = null,
+
+    // Stock tracking fields
+    val currentStock: Double? = null,
+    val unitsPerDose: Double? = null,
+    val stockUnit: String = "tablets",
+    val lowStockDays: Int = 2,
+    val lowStockAlertActive: Boolean = false
 )

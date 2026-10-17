@@ -10,7 +10,6 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/weekday_chip_text</item>
-        <item name="android:background">@drawable/weekday_chip_unselected</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
     </style>
