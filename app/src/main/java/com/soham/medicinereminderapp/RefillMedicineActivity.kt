@@ -1,5 +1,6 @@
 package com.soham.medicinereminderapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -8,11 +9,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.soham.medicinereminderapp.data.AppDatabase
-import com.soham.medicinereminderapp.repository.MedicineRepository
 import com.soham.medicinereminderapp.reminder.LowStockWorkScheduler
+import com.soham.medicinereminderapp.repository.MedicineRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class RefillMedicineActivity : AppCompatActivity() {
 
@@ -36,7 +38,11 @@ class RefillMedicineActivity : AppCompatActivity() {
         medicineId = intent.getIntExtra("medicineId", -1)
 
         if (medicineId <= 0) {
-            Toast.makeText(this, "Medicine not found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                getString(R.string.medicine_not_found),
+                Toast.LENGTH_SHORT
+            ).show()
             finish()
             return
         }
@@ -51,6 +57,7 @@ class RefillMedicineActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("StringFormatInvalid")
     private fun loadMedicine() {
         lifecycleScope.launch {
             val medicine = withContext(Dispatchers.IO) {
@@ -60,7 +67,7 @@ class RefillMedicineActivity : AppCompatActivity() {
             if (medicine == null) {
                 Toast.makeText(
                     this@RefillMedicineActivity,
-                    "Medicine not found",
+                    getString(R.string.medicine_not_found),
                     Toast.LENGTH_SHORT
                 ).show()
                 finish()
@@ -71,9 +78,13 @@ class RefillMedicineActivity : AppCompatActivity() {
 
             val stock = medicine.currentStock
             tvCurrentStock.text = if (stock == null) {
-                "Current stock: Not configured"
+                getString(R.string.current_stock_not_configured)
             } else {
-                "Current stock: ${formatQuantity(stock)} ${medicine.stockUnit}"
+                getString(
+                    R.string.current_stock_value,
+                    formatQuantity(stock),
+                    medicine.stockUnit
+                )
             }
 
             btnConfirmRefill.isEnabled = stock != null
@@ -82,7 +93,7 @@ class RefillMedicineActivity : AppCompatActivity() {
             if (stock == null) {
                 Toast.makeText(
                     this@RefillMedicineActivity,
-                    "Set the current stock in medicine details before refilling.",
+                    getString(R.string.configure_stock_before_refill),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -90,34 +101,53 @@ class RefillMedicineActivity : AppCompatActivity() {
     }
 
     private fun saveRefill() {
-        val quantity = etRefillQuantity.text.toString().trim().toDoubleOrNull()
+        val quantity = etRefillQuantity.text.toString()
+            .trim()
+            .toDoubleOrNull()
 
         if (quantity == null || !quantity.isFinite() || quantity <= 0.0) {
-            etRefillQuantity.error = "Enter a quantity greater than zero"
+            etRefillQuantity.error =
+                getString(R.string.enter_quantity_greater_than_zero)
             return
         }
 
         btnConfirmRefill.isEnabled = false
 
         lifecycleScope.launch {
-            val success = withContext(Dispatchers.IO) {
-                repository.addMedicineStock(medicineId, quantity)
-            }
+            try {
+                val success = withContext(Dispatchers.IO) {
+                    repository.addMedicineStock(medicineId, quantity)
+                }
 
-            if (success) {
-                LowStockWorkScheduler.checkNow(this@RefillMedicineActivity)
+                if (success) {
+                    LowStockWorkScheduler.checkNow(this@RefillMedicineActivity)
+
+                    Toast.makeText(
+                        this@RefillMedicineActivity,
+                        getString(R.string.medicine_stock_updated),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    finish()
+                } else {
+                    Toast.makeText(
+                        this@RefillMedicineActivity,
+                        getString(R.string.stock_update_failed),
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    btnConfirmRefill.isEnabled = true
+                }
+            } catch (e: Exception) {
+                android.util.Log.e(
+                    "RefillMedicineActivity",
+                    "Failed to update stock",
+                    e
+                )
 
                 Toast.makeText(
                     this@RefillMedicineActivity,
-                    "Medicine stock updated",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                finish()
-            } else {
-                Toast.makeText(
-                    this@RefillMedicineActivity,
-                    "Stock was not updated. Check the medicine's stock settings.",
+                    getString(R.string.stock_update_failed),
                     Toast.LENGTH_LONG
                 ).show()
 
@@ -130,7 +160,7 @@ class RefillMedicineActivity : AppCompatActivity() {
         return if (value % 1.0 == 0.0) {
             value.toLong().toString()
         } else {
-            String.format(java.util.Locale.getDefault(), "%.2f", value)
+            String.format(Locale.getDefault(), "%.2f", value)
                 .trimEnd('0')
                 .trimEnd('.')
         }

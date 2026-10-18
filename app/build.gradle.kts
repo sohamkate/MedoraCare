@@ -56,6 +56,7 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
 // Background low-stock checks
     implementation("androidx.work:work-runtime-ktx:2.10.5")
+    implementation("androidx.appcompat:appcompat:1.7.1")
     // Unit and instrumentation tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)

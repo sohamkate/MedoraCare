@@ -1,15 +1,12 @@
-
 package com.soham.medicinereminderapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -98,11 +95,7 @@ class AddMedicineActivity : AppCompatActivity() {
                     displayMedicineImage(file.absolutePath)
                 }
             } else {
-                Toast.makeText(
-                    this,
-                    "Photo was not captured",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showToast(getString(R.string.photo_not_captured))
             }
         }
 
@@ -113,11 +106,7 @@ class AddMedicineActivity : AppCompatActivity() {
             if (granted) {
                 openCamera()
             } else {
-                Toast.makeText(
-                    this,
-                    "Camera permission is required to take a photo",
-                    Toast.LENGTH_LONG
-                ).show()
+                showToast(getString(R.string.camera_permission_required))
             }
         }
 
@@ -133,7 +122,7 @@ class AddMedicineActivity : AppCompatActivity() {
         isEditMode = medicineId > 0
 
         if (isEditMode) {
-            btnSaveMedicine.text = "Update medicine"
+            btnSaveMedicine.text = getString(R.string.update_medicine)
             loadMedicineForEditing(medicineId)
         } else {
             setStockInputsEnabled(true)
@@ -187,7 +176,7 @@ class AddMedicineActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------- CALENDAR SCHEDULING ----------------
+    // Calendar scheduling
 
     private fun setupCalendarControls() {
         rgScheduleType.setOnCheckedChangeListener { _, checkedId ->
@@ -228,25 +217,17 @@ class AddMedicineActivity : AppCompatActivity() {
     private fun updateScheduleVisibility() {
         val isRange = scheduleType == MedicineSchedule.DATE_RANGE
 
-        btnStartDate.visibility =
-            if (isRange) View.VISIBLE else View.GONE
-
-        btnEndDate.visibility =
-            if (isRange) View.VISIBLE else View.GONE
-
-        btnAddSelectedDate.visibility =
-            if (isRange) View.GONE else View.VISIBLE
-
-        tvSelectedDates.visibility =
-            if (isRange) View.GONE else View.VISIBLE
+        btnStartDate.visibility = if (isRange) View.VISIBLE else View.GONE
+        btnEndDate.visibility = if (isRange) View.VISIBLE else View.GONE
+        btnAddSelectedDate.visibility = if (isRange) View.GONE else View.VISIBLE
+        tvSelectedDates.visibility = if (isRange) View.GONE else View.VISIBLE
     }
 
     private fun showDatePicker(
         initialDate: String,
         onSelected: (String) -> Unit
     ) {
-        val calendar = parseCalendarDate(initialDate)
-            ?: Calendar.getInstance()
+        val calendar = parseCalendarDate(initialDate) ?: Calendar.getInstance()
 
         DatePickerDialog(
             this,
@@ -269,9 +250,8 @@ class AddMedicineActivity : AppCompatActivity() {
         ).show()
     }
 
-    private fun todayString(): String {
-        return MedicineSchedule.formatDate(Calendar.getInstance())
-    }
+    private fun todayString(): String =
+        MedicineSchedule.formatDate(Calendar.getInstance())
 
     private fun parseCalendarDate(value: String): Calendar? {
         return try {
@@ -289,23 +269,22 @@ class AddMedicineActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("StringFormatInvalid")
     private fun updateDateButtonLabels() {
         btnStartDate.text = startDate?.let {
-            "Start date: $it"
-        } ?: "Choose start date"
+            getString(R.string.start_date_value, it)
+        } ?: getString(R.string.choose_start_date)
 
         btnEndDate.text = endDate?.let {
-            "End date: $it"
-        } ?: "Choose end date"
+            getString(R.string.end_date_value, it)
+        } ?: getString(R.string.choose_end_date)
     }
 
     private fun refreshSelectedDatesText() {
         tvSelectedDates.text = if (selectedDates.isEmpty()) {
-            "No individual dates selected"
+            getString(R.string.no_individual_dates_selected)
         } else {
-            selectedDates.joinToString("\n") { date ->
-                "• $date"
-            }
+            selectedDates.joinToString("\n") { "• $it" }
         }
     }
 
@@ -315,27 +294,27 @@ class AddMedicineActivity : AppCompatActivity() {
             val end = endDate
 
             if (start == null || end == null) {
-                showToast("Please choose both start and end dates")
+                showToast(getString(R.string.choose_both_dates))
                 return false
             }
 
             if (start > end) {
-                showToast("End date must be on or after start date")
+                showToast(getString(R.string.end_date_invalid))
                 return false
             }
 
             if (end < todayString()) {
-                showToast("Please choose a future or current date range")
+                showToast(getString(R.string.choose_current_or_future_range))
                 return false
             }
         } else {
             if (selectedDates.isEmpty()) {
-                showToast("Please select at least one calendar date")
+                showToast(getString(R.string.select_at_least_one_date))
                 return false
             }
 
             if (selectedDates.none { it >= todayString() }) {
-                showToast("Select at least one current or future date")
+                showToast(getString(R.string.select_current_or_future_date))
                 return false
             }
         }
@@ -343,7 +322,7 @@ class AddMedicineActivity : AppCompatActivity() {
         return true
     }
 
-    // ---------------- REMINDER TIMES ----------------
+    // Reminder times
 
     private fun showTimePicker() {
         val now = Calendar.getInstance()
@@ -356,7 +335,7 @@ class AddMedicineActivity : AppCompatActivity() {
                 }
 
                 if (duplicate) {
-                    showToast("This reminder time is already added")
+                    showToast(getString(R.string.reminder_time_already_added))
                     return@TimePickerDialog
                 }
 
@@ -376,7 +355,7 @@ class AddMedicineActivity : AppCompatActivity() {
 
     private fun displayReminderTimes() {
         tvSelectedTimes.text = if (reminderTimes.isEmpty()) {
-            "No reminder times added"
+            getString(R.string.no_reminder_times_added)
         } else {
             reminderTimes.joinToString("\n") { time ->
                 val calendar = Calendar.getInstance().apply {
@@ -390,7 +369,7 @@ class AddMedicineActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------- MEDICINE PHOTO ----------------
+    // Medicine photo
 
     private fun openCamera() {
         try {
@@ -418,7 +397,7 @@ class AddMedicineActivity : AppCompatActivity() {
                 "Could not open camera",
                 e
             )
-            showToast("Unable to open camera")
+            showToast(getString(R.string.unable_to_open_camera))
         }
     }
 
@@ -450,7 +429,7 @@ class AddMedicineActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------- STOCK INPUTS ----------------
+    // Stock inputs
 
     private fun setStockInputsEnabled(enabled: Boolean) {
         etInitialStock.isEnabled = enabled
@@ -462,18 +441,14 @@ class AddMedicineActivity : AppCompatActivity() {
         val stockText = etInitialStock.text.toString().trim()
         val unitsText = etUnitsPerDose.text.toString().trim()
         val unit = etStockUnit.text.toString().trim()
-            .ifBlank { "tablets" }
+            .ifBlank { getString(R.string.tablets_unit) }
 
         if (stockText.isBlank() && unitsText.isBlank()) {
-            return StockInputs(
-                currentStock = null,
-                unitsPerDose = null,
-                stockUnit = unit
-            )
+            return StockInputs(null, null, unit)
         }
 
         if (stockText.isBlank() || unitsText.isBlank()) {
-            showToast("Enter both initial stock and units per dose")
+            showToast(getString(R.string.enter_stock_and_units))
             return null
         }
 
@@ -481,23 +456,19 @@ class AddMedicineActivity : AppCompatActivity() {
         val units = unitsText.toDoubleOrNull()
 
         if (stock == null || !stock.isFinite() || stock < 0.0) {
-            showToast("Enter a valid non-negative stock quantity")
+            showToast(getString(R.string.enter_valid_stock))
             return null
         }
 
         if (units == null || !units.isFinite() || units <= 0.0) {
-            showToast("Units per dose must be greater than zero")
+            showToast(getString(R.string.units_per_dose_invalid))
             return null
         }
 
-        return StockInputs(
-            currentStock = stock,
-            unitsPerDose = units,
-            stockUnit = unit
-        )
+        return StockInputs(stock, units, unit)
     }
 
-    // ---------------- LOAD EXISTING MEDICINE ----------------
+    // Load medicine for editing
 
     private fun loadMedicineForEditing(id: Int) {
         lifecycleScope.launch {
@@ -507,7 +478,7 @@ class AddMedicineActivity : AppCompatActivity() {
                 }
 
                 if (item == null) {
-                    showToast("Medicine not found")
+                    showToast(getString(R.string.medicine_not_found))
                     finish()
                     return@launch
                 }
@@ -521,11 +492,12 @@ class AddMedicineActivity : AppCompatActivity() {
                 medicineImagePath = medicine.imagePath
                 displayMedicineImage(medicineImagePath)
 
-                scheduleType = when (medicine.scheduleType) {
-                    MedicineSchedule.SELECTED_DATES ->
-                        MedicineSchedule.SELECTED_DATES
-
-                    else -> MedicineSchedule.DATE_RANGE
+                scheduleType = if (
+                    medicine.scheduleType == MedicineSchedule.SELECTED_DATES
+                ) {
+                    MedicineSchedule.SELECTED_DATES
+                } else {
+                    MedicineSchedule.DATE_RANGE
                 }
 
                 startDate = medicine.startDate
@@ -556,10 +528,12 @@ class AddMedicineActivity : AppCompatActivity() {
                         ReminderTime(it.hour, it.minute)
                     }
                 )
+
                 reminderTimes.sortWith(
                     compareBy<ReminderTime> { it.hour }
                         .thenBy { it.minute }
                 )
+
                 displayReminderTimes()
 
                 etInitialStock.setText(
@@ -570,7 +544,7 @@ class AddMedicineActivity : AppCompatActivity() {
                 )
                 etStockUnit.setText(medicine.stockUnit)
 
-                // Preserve existing stock while editing this medicine.
+                // Stock is preserved while editing; use the refill screen to change it.
                 setStockInputsEnabled(false)
 
             } catch (e: Exception) {
@@ -579,35 +553,35 @@ class AddMedicineActivity : AppCompatActivity() {
                     "Failed to load medicine",
                     e
                 )
-                showToast("Unable to load medicine details")
+                showToast(getString(R.string.unable_to_load_medicine))
             }
         }
     }
 
-    // ---------------- SAVE / UPDATE ----------------
+    // Save or update medicine
 
+    @SuppressLint("StringFormatInvalid")
     private fun saveMedicine() {
         if (isSaving) return
 
         val name = etMedicineName.text.toString().trim()
         val dosage = etDosage.text.toString().trim()
-        val notes = etMedicineNotes.text.toString().trim()
-            .ifBlank { null }
+        val notes = etMedicineNotes.text.toString().trim().ifBlank { null }
 
         if (name.isBlank()) {
-            etMedicineName.error = "Enter medicine name"
+            etMedicineName.error = getString(R.string.enter_medicine_name)
             etMedicineName.requestFocus()
             return
         }
 
         if (dosage.isBlank()) {
-            etDosage.error = "Enter dosage"
+            etDosage.error = getString(R.string.enter_dosage)
             etDosage.requestFocus()
             return
         }
 
         if (reminderTimes.isEmpty()) {
-            showToast("Add at least one reminder time")
+            showToast(getString(R.string.add_at_least_one_reminder_time))
             return
         }
 
@@ -626,22 +600,12 @@ class AddMedicineActivity : AppCompatActivity() {
             try {
                 withContext(Dispatchers.IO) {
                     if (isEditMode) {
-                        updateExistingMedicine(
-                            name = name,
-                            dosage = dosage,
-                            notes = notes
-                        )
+                        updateExistingMedicine(name, dosage, notes)
                     } else {
-                        insertNewMedicine(
-                            name = name,
-                            dosage = dosage,
-                            notes = notes,
-                            stockInputs = stockInputs!!
-                        )
+                        insertNewMedicine(name, dosage, notes, stockInputs!!)
                     }
                 }
 
-                // Update alarms after the medicine and its times have been saved.
                 val savedItem = withContext(Dispatchers.IO) {
                     dao.getMedicineWithTimes(medicineId)
                 }
@@ -667,11 +631,13 @@ class AddMedicineActivity : AppCompatActivity() {
                 LowStockWorkScheduler.checkNow(applicationContext)
 
                 showToast(
-                    if (isEditMode) {
-                        "Medicine updated successfully"
-                    } else {
-                        "Medicine saved successfully"
-                    }
+                    getString(
+                        if (isEditMode) {
+                            R.string.medicine_updated_successfully
+                        } else {
+                            R.string.medicine_saved_successfully
+                        }
+                    )
                 )
 
                 setResult(RESULT_OK)
@@ -683,7 +649,12 @@ class AddMedicineActivity : AppCompatActivity() {
                     "Could not save medicine",
                     e
                 )
-                showToast("Could not save medicine: ${e.message ?: "unknown error"}")
+                showToast(
+                    getString(
+                        R.string.could_not_save_medicine,
+                        e.message ?: "unknown error"
+                    )
+                )
             } finally {
                 isSaving = false
                 btnSaveMedicine.isEnabled = true
@@ -728,9 +699,10 @@ class AddMedicineActivity : AppCompatActivity() {
         notes: String?
     ) {
         val oldItem = dao.getMedicineWithTimes(medicineId)
-            ?: throw IllegalStateException("Medicine no longer exists")
+            ?: throw IllegalStateException(
+                getString(R.string.medicine_no_longer_exists)
+            )
 
-        // Cancel alarms and snoozes before replacing their reminder times.
         oldItem.reminderTimes.forEach { time ->
             ReminderScheduler.cancelReminder(this, time.id)
             ReminderScheduler.cancelSnooze(this, time.id)
@@ -751,8 +723,8 @@ class AddMedicineActivity : AppCompatActivity() {
         )
 
         dao.updateMedicine(updatedMedicine)
-
         dao.deleteMedicineTimesForMedicine(medicineId)
+
         saveSelectedDates()
         saveReminderTimes()
     }
@@ -788,10 +760,6 @@ class AddMedicineActivity : AppCompatActivity() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(
-            this,
-            message,
-            Toast.LENGTH_LONG
-        ).show()
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }

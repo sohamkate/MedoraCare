@@ -94,22 +94,35 @@ class MedicineAdapter(
             itemView.findViewById(R.id.tvStockWarning)
 
         private fun bindStockStatus(item: MedicineWithTimes) {
+            val context = itemView.context
             val medicine = item.medicine
             val stock = medicine.currentStock
             val unitsPerDose = medicine.unitsPerDose
 
             tvStockWarning.visibility = View.GONE
 
-            if (stock == null || unitsPerDose == null || unitsPerDose <= 0.0) {
-                tvStockQuantity.text = "Stock remaining: Stock not set"
-                tvStockDaysRemaining.text = "Estimated supply: Not available"
+            if (
+                stock == null ||
+                unitsPerDose == null ||
+                unitsPerDose <= 0.0
+            ) {
+                tvStockQuantity.text =
+                    context.getString(R.string.stock_not_set)
+
+                tvStockDaysRemaining.text =
+                    context.getString(R.string.supply_not_available)
+
                 return
             }
 
-            tvStockQuantity.text =
-                "Stock remaining: ${formatQuantity(stock)} ${medicine.stockUnit}"
+            tvStockQuantity.text = context.getString(
+                R.string.stock_remaining,
+                formatQuantity(stock),
+                medicine.stockUnit
+            )
 
-            val enabledTimes = item.reminderTimes.filter { it.isEnabled }
+            val enabledTimes = item.reminderTimes
+                .filter { it.isEnabled }
 
             val selectedDays = medicine.weekdays
                 .split(",")
@@ -119,7 +132,8 @@ class MedicineAdapter(
 
             if (enabledTimes.isEmpty() || selectedDays.isEmpty()) {
                 tvStockDaysRemaining.text =
-                    "Estimated supply: Schedule unavailable"
+                    context.getString(R.string.schedule_unavailable)
+
                 return
             }
 
@@ -130,25 +144,35 @@ class MedicineAdapter(
 
             if (unitsUsedPerDay <= 0.0) {
                 tvStockDaysRemaining.text =
-                    "Estimated supply: Not available"
+                    context.getString(R.string.supply_not_available)
+
                 return
             }
 
             val daysRemaining = stock / unitsUsedPerDay
 
-            tvStockDaysRemaining.text =
-                "Estimated supply: ${
-                    String.format(Locale.getDefault(), "%.1f", daysRemaining)
-                } days"
+            val formattedDays = String.format(
+                Locale.getDefault(),
+                "%.1f",
+                daysRemaining
+            )
+
+            tvStockDaysRemaining.text = context.getString(
+                R.string.estimated_supply_days,
+                formattedDays
+            )
 
             if (stock <= 0.0) {
                 tvStockWarning.text =
-                    "Stock depleted — check physical stock"
+                    context.getString(R.string.stock_depleted_warning)
+
                 tvStockWarning.setTextColor(Color.RED)
                 tvStockWarning.visibility = View.VISIBLE
+
             } else if (daysRemaining <= medicine.lowStockDays) {
                 tvStockWarning.text =
-                    "Low stock — refill may be needed"
+                    context.getString(R.string.low_stock_warning)
+
                 tvStockWarning.setTextColor(Color.rgb(180, 83, 9))
                 tvStockWarning.visibility = View.VISIBLE
             }
@@ -158,13 +182,18 @@ class MedicineAdapter(
             return if (value % 1.0 == 0.0) {
                 value.toLong().toString()
             } else {
-                String.format(Locale.getDefault(), "%.2f", value)
+                String.format(
+                    Locale.getDefault(),
+                    "%.2f",
+                    value
+                )
                     .trimEnd('0')
                     .trimEnd('.')
             }
         }
 
         fun bind(item: MedicineWithTimes) {
+            val context = itemView.context
             val medicine = item.medicine
 
             tvMedicineName.text = medicine.name
@@ -172,7 +201,7 @@ class MedicineAdapter(
 
             bindStockStatus(item)
 
-            // Display medicine photo.
+            // Display the saved medicine photo, if available.
             val imagePath = medicine.imagePath
 
             if (!imagePath.isNullOrBlank() && File(imagePath).exists()) {
@@ -187,7 +216,10 @@ class MedicineAdapter(
             val notes = medicine.notes?.trim()
 
             if (!notes.isNullOrEmpty()) {
-                tvMedicineNotes.text = "Notes: $notes"
+                tvMedicineNotes.text = context.getString(
+                    R.string.medicine_notes_format,
+                    notes
+                )
                 tvMedicineNotes.visibility = View.VISIBLE
             } else {
                 tvMedicineNotes.text = ""
@@ -200,9 +232,9 @@ class MedicineAdapter(
                 .sortedWith(compareBy({ it.hour }, { it.minute }))
 
             tvReminderTimes.text = if (enabledTimes.isEmpty()) {
-                "No active reminders"
+                context.getString(R.string.no_active_reminders)
             } else {
-                "Reminder: " + enabledTimes.joinToString(", ") {
+                val times = enabledTimes.joinToString(", ") {
                     String.format(
                         Locale.getDefault(),
                         "%02d:%02d",
@@ -210,7 +242,13 @@ class MedicineAdapter(
                         it.minute
                     )
                 }
+
+                context.getString(R.string.reminder_times_format, times)
             }
+
+            btnEdit.text = context.getString(R.string.edit)
+            btnDelete.text = context.getString(R.string.delete)
+            btnRefill.text = context.getString(R.string.refill)
 
             btnEdit.setOnClickListener {
                 onEditClick(medicine)
@@ -220,12 +258,11 @@ class MedicineAdapter(
                 onDeleteClick(medicine)
             }
 
-            // Open the refill screen for this medicine.
             btnRefill.setOnClickListener {
                 onRefillClick(medicine)
             }
 
-            // Display today's dose actions.
+            // Display today's dose records and available actions.
             layoutDoseActions.removeAllViews()
 
             val logs = todayDoseLogs
@@ -233,8 +270,8 @@ class MedicineAdapter(
                 .sortedBy { it.scheduledTime }
 
             if (logs.isEmpty()) {
-                val message = TextView(itemView.context).apply {
-                    text = "No dose records for today"
+                val message = TextView(context).apply {
+                    text = context.getString(R.string.no_dose_records_today)
                     textSize = 13f
                     setTextColor(Color.GRAY)
                     setPadding(0, 8, 0, 8)
@@ -250,14 +287,26 @@ class MedicineAdapter(
             )
 
             logs.forEach { log ->
-                val doseRow = LinearLayout(itemView.context).apply {
+                val doseRow = LinearLayout(context).apply {
                     orientation = LinearLayout.VERTICAL
                     setPadding(0, 10, 0, 10)
                 }
 
-                val label = TextView(itemView.context).apply {
-                    text = "${timeFormat.format(Date(log.scheduledTime))} • " +
-                            log.status.replace("_", " ")
+                val label = TextView(context).apply {
+                    val localizedStatus = when (log.status) {
+                        "PENDING" -> context.getString(R.string.dose_pending)
+                        "TAKEN" -> context.getString(R.string.dose_taken)
+                        "NOT_TAKEN" -> context.getString(R.string.dose_not_taken)
+                        "MISSED" -> context.getString(R.string.dose_missed)
+                        else -> log.status.replace("_", " ")
+                    }
+
+                    text = context.getString(
+                        R.string.dose_status_format,
+                        timeFormat.format(Date(log.scheduledTime)),
+                        localizedStatus
+                    )
+
                     textSize = 14f
                     setTextColor(Color.DKGRAY)
                 }
@@ -265,12 +314,12 @@ class MedicineAdapter(
                 doseRow.addView(label)
 
                 if (log.status == "PENDING") {
-                    val actions = LinearLayout(itemView.context).apply {
+                    val actions = LinearLayout(context).apply {
                         orientation = LinearLayout.HORIZONTAL
                     }
 
-                    val takenButton = Button(itemView.context).apply {
-                        text = "Taken"
+                    val takenButton = Button(context).apply {
+                        text = context.getString(R.string.dose_taken_button)
                         isAllCaps = false
 
                         setOnClickListener {
@@ -278,8 +327,8 @@ class MedicineAdapter(
                         }
                     }
 
-                    val notTakenButton = Button(itemView.context).apply {
-                        text = "Not Taken"
+                    val notTakenButton = Button(context).apply {
+                        text = context.getString(R.string.dose_not_taken_button)
                         isAllCaps = false
 
                         setOnClickListener {

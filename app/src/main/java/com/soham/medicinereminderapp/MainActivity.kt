@@ -7,12 +7,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Button
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -43,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(
                     this,
-                    "Notifications are disabled. Enable them in Settings to receive reminders.",
+                    getString(R.string.notifications_disabled),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -58,6 +62,8 @@ class MainActivity : AppCompatActivity() {
         val btnAddMedicine = findViewById<Button>(R.id.btnAddMedicine)
         val rvMedicines = findViewById<RecyclerView>(R.id.rvMedicines)
         val layoutEmptyState = findViewById<View>(R.id.layoutEmptyState)
+
+        setupLanguageSpinner()
 
         val bottomNavigation =
             findViewById<BottomNavigationView>(R.id.bottomNavigation)
@@ -129,17 +135,23 @@ class MainActivity : AppCompatActivity() {
 
                         Toast.makeText(
                             this@MainActivity,
-                            if (taken) {
-                                "Dose marked as taken"
-                            } else {
-                                "Dose marked as not taken"
-                            },
+                            getString(
+                                if (taken) {
+                                    R.string.dose_marked_taken
+                                } else {
+                                    R.string.dose_marked_not_taken
+                                }
+                            ),
                             Toast.LENGTH_SHORT
                         ).show()
+
                     } catch (e: Exception) {
                         Toast.makeText(
                             this@MainActivity,
-                            "Could not update dose: ${e.message}",
+                            getString(
+                                R.string.could_not_update_dose,
+                                e.message ?: ""
+                            ),
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -172,6 +184,55 @@ class MainActivity : AppCompatActivity() {
         observeTodayDoseLogs()
     }
 
+    private fun setupLanguageSpinner() {
+        val spinnerLanguage =
+            findViewById<Spinner>(R.id.spinnerLanguage)
+
+        val currentLanguage =
+            AppCompatDelegate.getApplicationLocales()
+                .get(0)?.language ?: "en"
+
+        // Select the currently active app language without triggering
+        // a language change during initial setup.
+        spinnerLanguage.setSelection(
+            if (currentLanguage == "hi") 1 else 0,
+            false
+        )
+
+        spinnerLanguage.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedLanguage = when (position) {
+                        0 -> "en"
+                        1 -> "hi"
+                        else -> return
+                    }
+
+                    val activeLanguage =
+                        AppCompatDelegate.getApplicationLocales()
+                            .get(0)?.language ?: "en"
+
+                    if (selectedLanguage != activeLanguage) {
+                        AppCompatDelegate.setApplicationLocales(
+                            LocaleListCompat.forLanguageTags(
+                                selectedLanguage
+                            )
+                        )
+                    }
+                }
+
+                override fun onNothingSelected(
+                    parent: AdapterView<*>?
+                ) = Unit
+            }
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -195,9 +256,13 @@ class MainActivity : AppCompatActivity() {
 
                     emptyMessage.text =
                         if (isEmpty) {
-                            "No medicines added yet. Tap Add Medicine to get started."
+                            getString(
+                                R.string.no_medicines_added_yet_tap_add_medicine_to_get_started
+                            )
                         } else {
-                            "Your medicines will appear here."
+                            getString(
+                                R.string.your_medicines_will_appear_here
+                            )
                         }
                 }
             }
@@ -255,13 +320,17 @@ class MainActivity : AppCompatActivity() {
 
                 Toast.makeText(
                     this@MainActivity,
-                    "Medicine deleted",
+                    getString(R.string.medicine_deleted),
                     Toast.LENGTH_SHORT
                 ).show()
+
             } catch (e: Exception) {
                 Toast.makeText(
                     this@MainActivity,
-                    "Could not delete medicine: ${e.message}",
+                    getString(
+                        R.string.could_not_delete_medicine,
+                        e.message ?: ""
+                    ),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -269,13 +338,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getGreeting(): String {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val hour = Calendar.getInstance()
+            .get(Calendar.HOUR_OF_DAY)
 
         return when (hour) {
-            in 5..11 -> "Good morning, User!"
-            in 12..16 -> "Good afternoon, User!"
-            in 17..20 -> "Good evening, User!"
-            else -> "Hello, User!"
+            in 5..11 -> getString(R.string.greeting_morning)
+            in 12..16 -> getString(R.string.greeting_afternoon)
+            in 17..20 -> getString(R.string.greeting_evening)
+            else -> getString(R.string.greeting_hello)
         }
     }
 

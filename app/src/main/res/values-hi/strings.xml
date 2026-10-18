@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Language -->
+    <string name="language_english">English</string>
+    <string name="language_hindi">हिन्दी</string>
+    <string name="select_language">भाषा चुनें</string>
+    <string-array name="app_languages">
+        <item>@string/language_english</item>
+        <item>@string/language_hindi</item>
+    </string-array>
+
+    <!-- Dashboard -->
+    <string name="app_name">Medora Care</string>
+    <string name="good_morning_user">सुप्रभात, User!</string>
+    <string name="stay_consistent_stay_healthy">नियमित रहें, स्वस्थ रहें।</string>
+    <string name="medicine_details">दवा का विवरण 💊</string>
+    <string name="add_medicine">＋ दवा जोड़ें</string>
+    <string name="your_medicines">आपकी दवाएँ</string>
+    <string name="no_medicines_added_yet_tap_add_medicine_to_get_started">अभी तक कोई दवा नहीं जोड़ी गई है। शुरू करने के लिए दवा जोड़ें पर टैप करें।</string>
+    <string name="medicine_history">दवा का इतिहास</string>
+    <string name="review_your_previous_dose_records">अपनी पिछली खुराक का रिकॉर्ड देखें</string>
+    <string name="no_dose_history_available_yet">अभी तक खुराक का कोई इतिहास उपलब्ध नहीं है।</string>
+    <string name="medicine_photo">दवा की फोटो</string>
+    <string name="medicine_name">दवा का नाम</string>
+    <string name="dosage">खुराक</string>
+    <string name="edit">संपादित करें</string>
+    <string name="delete">हटाएँ</string>
+    <string name="home">होम</string>
+    <string name="history">इतिहास</string>
+    <string name="notes">नोट्स</string>
+    <string name="taken">ली गई</string>
+    <string name="enabled">चालू</string>
+    <string name="recent_doses">हाल की खुराक</string>
+    <string name="enter_medicine_details_and_set_your_reminders">दवा का विवरण भरें और रिमाइंडर सेट करें</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">सुप्रभात, User!</string>
+    <string name="greeting_afternoon">नमस्कार, User!</string>
+    <string name="greeting_evening">शुभ संध्या, User!</string>
+    <string name="greeting_hello">नमस्ते, User!</string>
+
+    <!-- Dose tracking -->
+    <string name="notifications_disabled">सूचनाएँ बंद हैं। रिमाइंडर पाने के लिए सेटिंग्स में इन्हें चालू करें।</string>
+    <string name="dose_marked_taken">दवा लेने की पुष्टि की गई</string>
+    <string name="dose_marked_not_taken">दवा नहीं लेने के रूप में दर्ज किया गया</string>
+    <string name="could_not_update_dose">खुराक अपडेट नहीं हो सकी: %1$s</string>
+    <string name="your_medicines_will_appear_here">आपकी दवाइयाँ यहाँ दिखाई देंगी।</string>
+    <string name="medicine_deleted">दवा हटा दी गई</string>
+    <string name="could_not_delete_medicine">दवा हटाई नहीं जा सकी: %1$s</string>
+    <string name="no_dose_records_today">आज की कोई खुराक दर्ज नहीं है</string>
+    <string name="dose_pending">लंबित</string>
+    <string name="dose_taken">ली गई</string>
+    <string name="dose_not_taken">नहीं ली गई</string>
+    <string name="dose_missed">छूट गई</string>
+    <string name="dose_status_format">%1$s • %2$s</string>
+    <string name="dose_taken_button">ली गई</string>
+    <string name="dose_not_taken_button">नहीं ली गई</string>
+
+    <!-- Stock and supply -->
+    <string name="stock_not_set">शेष स्टॉक: स्टॉक सेट नहीं है</string>
+    <string name="supply_not_available">अनुमानित आपूर्ति: उपलब्ध नहीं</string>
+    <string name="stock_remaining">शेष स्टॉक: %1$s %2$s</string>
+    <string name="schedule_unavailable">अनुमानित आपूर्ति: शेड्यूल उपलब्ध नहीं</string>
+    <string name="estimated_supply_days">अनुमानित आपूर्ति: %1$s दिन</string>
+    <string name="stock_depleted_warning">स्टॉक समाप्त — वास्तविक स्टॉक जाँचें</string>
+    <string name="low_stock_warning">स्टॉक कम है — रिफिल की आवश्यकता हो सकती है</string>
+    <string name="medicine_notes_format">नोट्स: %1$s</string>
+    <string name="no_active_reminders">कोई सक्रिय रिमाइंडर नहीं</string>
+    <string name="reminder_times_format">रिमाइंडर: %1$s</string>
+    <string name="refill">रिफिल</string>
+
+    <!-- Add Medicine screen -->
+    <string name="medicine_details_title">दवा का विवरण</string>
+    <string name="medicine_name_required">दवा का नाम *</string>
+    <string name="medicine_name_hint">जैसे, विटामिन D</string>
+    <string name="dosage_required">खुराक *</string>
+    <string name="dosage_hint">जैसे, 1 टैबलेट</string>
+    <string name="notes_optional">नोट्स (वैकल्पिक)</string>
+    <string name="additional_information">अतिरिक्त जानकारी</string>
+
+    <!-- Schedule -->
+    <string name="reminder_schedule">रिमाइंडर का समय</string>
+    <string name="reminder_schedule_title">रिमाइंडर शेड्यूल</string>
+    <string name="choose_medicine_schedule">चुनें कि इस दवा का शेड्यूल कब होना चाहिए।</string>
+    <string name="every_day_within_date_range">तारीखों की सीमा में हर दिन</string>
+    <string name="only_selected_dates">केवल चुनी गई तारीखों पर</string>
+    <string name="start_date_value">शुरुआत की तारीख: %1$s</string>
+    <string name="choose_start_date">शुरुआत की तारीख चुनें</string>
+    <string name="end_date_value">समाप्ति की तारीख: %1$s</string>
+    <string name="choose_end_date">समाप्ति की तारीख चुनें</string>
+    <string name="add_calendar_date">कैलेंडर से तारीख जोड़ें</string>
+    <string name="no_individual_dates_selected">कोई अलग तारीख नहीं चुनी गई</string>
+    <string name="choose_both_dates">शुरुआत और समाप्ति, दोनों तारीखें चुनें</string>
+    <string name="end_date_invalid">समाप्ति की तारीख शुरुआत से पहले नहीं हो सकती</string>
+    <string name="choose_current_or_future_range">आज या भविष्य की तारीखों की सीमा चुनें</string>
+    <string name="select_at_least_one_date">कम से कम एक कैलेंडर तारीख चुनें</string>
+    <string name="select_current_or_future_date">आज या भविष्य की कम से कम एक तारीख चुनें</string>
+
+    <!-- Reminder times -->
+    <string name="add_reminder_time">रिमाइंडर समय जोड़ें</string>
+    <string name="no_reminder_times_selected">कोई रिमाइंडर समय नहीं चुना गया</string>
+    <string name="reminder_times_title">रिमाइंडर का समय</string>
+    <string name="add_one_or_more_reminder_times">हर निर्धारित दिन के लिए एक या अधिक समय जोड़ें।</string>
+    <string name="no_reminder_times_added">कोई रिमाइंडर समय नहीं जोड़ा गया</string>
+    <string name="reminder_time_already_added">यह रिमाइंडर समय पहले से जोड़ा गया है</string>
+    <string name="add_at_least_one_reminder_time">कम से कम एक रिमाइंडर समय जोड़ें</string>
+
+    <!-- Medicine stock inputs -->
+    <string name="medicine_stock_optional">दवा का स्टॉक (वैकल्पिक)</string>
+    <string name="stock_details_for_new_medicine">नई दवा जोड़ते समय यह जानकारी भरें।</string>
+    <string name="initial_stock_quantity">शुरुआती स्टॉक की मात्रा</string>
+    <string name="units_used_per_dose">हर खुराक में इस्तेमाल होने वाली इकाइयाँ</string>
+    <string name="stock_unit_hint">स्टॉक की इकाई (जैसे, टैबलेट)</string>
+    <string name="tablets_unit">टैबलेट</string>
+    <string name="enter_stock_and_units">शुरुआती स्टॉक और प्रति खुराक इकाइयाँ, दोनों दर्ज करें</string>
+    <string name="enter_valid_stock">स्टॉक की सही, गैर-ऋणात्मक मात्रा दर्ज करें</string>
+    <string name="units_per_dose_invalid">प्रति खुराक इकाइयाँ शून्य से अधिक होनी चाहिए</string>
+
+    <!-- Medicine photo -->
+    <string name="medicine_photo_optional">दवा की फोटो (वैकल्पिक)</string>
+    <string name="medicine_photo_preview">दवा की फोटो का पूर्वावलोकन</string>
+    <string name="take_medicine_photo">दवा की फोटो लें</string>
+    <string name="capture_medicine_photo">दवा की फोटो लें</string>
+    <string name="selected_medicine_photo">चुनी गई दवा की फोटो</string>
+    <string name="photo_not_captured">फोटो नहीं ली गई</string>
+    <string name="camera_permission_required">फोटो लेने के लिए कैमरे की अनुमति आवश्यक है</string>
+    <string name="unable_to_open_camera">कैमरा नहीं खुल सका</string>
+
+    <!-- Save and edit -->
+    <string name="save_medicine">दवा सेव करें</string>
+    <string name="update_medicine">दवा अपडेट करें</string>
+    <string name="medicine_not_found">दवा नहीं मिली</string>
+    <string name="enter_medicine_name">दवा का नाम दर्ज करें</string>
+    <string name="enter_dosage">खुराक दर्ज करें</string>
+    <string name="medicine_updated_successfully">दवा सफलतापूर्वक अपडेट हुई</string>
+    <string name="medicine_saved_successfully">दवा सफलतापूर्वक सेव हुई</string>
+    <string name="could_not_save_medicine">दवा सेव नहीं हो सकी: %1$s</string>
+    <string name="unknown_error">अज्ञात त्रुटि</string>
+    <string name="unable_to_load_medicine">दवा का विवरण लोड नहीं हो सका</string>
+    <string name="medicine_no_longer_exists">दवा अब मौजूद नहीं है</string>
+
+    <!-- Refill screen -->
+    <string name="refill_medicine_title">दवा रीफिल करें</string>
+    <string name="medicine_name_label">दवा का नाम</string>
+    <string name="current_stock_label">मौजूदा स्टॉक</string>
+    <string name="quantity_added">जोड़ने की मात्रा</string>
+    <string name="refill_quantity_hint">जोड़ने की मात्रा दर्ज करें</string>
+    <string name="add_to_current_stock">मौजूदा स्टॉक में जोड़ें</string>
+    <string name="current_stock_not_configured">मौजूदा स्टॉक: सेट नहीं है</string>
+    <string name="current_stock_value">मौजूदा स्टॉक: %1$s %2$s</string>
+    <string name="configure_stock_before_refill">रीफिल करने से पहले दवा के विवरण में मौजूदा स्टॉक सेट करें।</string>
+    <string name="enter_quantity_greater_than_zero">शून्य से अधिक मात्रा दर्ज करें</string>
+    <string name="medicine_stock_updated">दवा का स्टॉक अपडेट हुआ</string>
+    <string name="stock_update_failed">स्टॉक अपडेट नहीं हुआ। दवा की स्टॉक सेटिंग जाँचें।</string>
+    <string name="Medicine_history">दवा का इतिहास</string>
+    <string name="vitamin_d">विटामिन डी</string>
+    <string name="_1_tablet">1 टैबलेट</string>
+    <string name="_11_oct_2026_08_00_am">11 अक्टूबर 2026, सुबह 08:00 बजे</string>
+    <string name="reminder_08_00">रिमाइंडर: सुबह 08:00 बजे</string>
+    <string name="_08_00_am">सुबह 08:00 बजे</string>
+    <string name="delete_reminder_time">रिमाइंडर का समय हटाएँ</string>
+
+
+</resources>

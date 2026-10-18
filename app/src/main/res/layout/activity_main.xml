@@ -21,9 +21,18 @@
             android:orientation="vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:paddingTop="24dp"
+            android:paddingTop="16dp"
             android:paddingBottom="20dp">
 
+            <Spinner
+                android:id="@+id/spinnerLanguage"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="end"
+                android:entries="@array/app_languages"
+                android:spinnerMode="dropdown"
+                android:dropDownWidth="wrap_content"
+                android:contentDescription="@string/select_language" />
             <TextView
                 android:id="@+id/tvGreeting"
                 android:layout_width="match_parent"
@@ -99,7 +108,6 @@
                 android:paddingBottom="12dp" />
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

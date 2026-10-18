@@ -1,62 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Language -->
+    <string name="language_english">English</string>
+    <string name="language_hindi">हिन्दी</string>
+    <string name="select_language">Select language</string>
+    <string-array name="app_languages">
+        <item>@string/language_english</item>
+        <item>@string/language_hindi</item>
+    </string-array>
+
+    <!-- Dashboard -->
+    <string name="app_name">Medora Care</string>
     <string name="good_morning_user">Good morning, User!</string>
     <string name="stay_consistent_stay_healthy">Stay consistent, stay healthy.</string>
-    <string name="medicine_details">Medicine Details💊</string>
+    <string name="medicine_details">Medicine Details 💊</string>
     <string name="add_medicine">＋ Add Medicine</string>
     <string name="your_medicines">Your medicines</string>
     <string name="no_medicines_added_yet_tap_add_medicine_to_get_started">No medicines added yet. Tap Add Medicine to get started.</string>
-    <string name="medicine_history">Medicine_History</string>
-    <string name="review_your_previous_dose_records">review your previous dose records</string>
-    <string name="no_dose_history_available_yet">no dose history available yet</string>
+    <string name="medicine_history">Medicine History</string>
+    <string name="review_your_previous_dose_records">Review your previous dose records</string>
+    <string name="no_dose_history_available_yet">No dose history available yet.</string>
     <string name="medicine_photo">Medicine photo</string>
     <string name="medicine_name">Medicine name</string>
     <string name="dosage">Dosage</string>
-    <string name="reminder_08_00">Reminder: 08:00</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="home">Home</string>
     <string name="history">History</string>
-    <string name="Add_medicine">Add medicine</string>
-    <string name="e_g_vitamin_d">Vitamin D</string>
-    <string name="e_g_1_tablet">1 Tablet</string>
-    <string name="reminder_schedule">Reminder_schedule</string>
-    <string name="add_every_time_you_need_to_take_this_medicine">Add every time you need to take this medicine</string>
-
-    <string name="no_reminder_times_selected">No reminder times selected</string>
-    <string name="save_medicine">Save medicine</string>
     <string name="notes">Notes</string>
-    <string name="e_g_take_after_food">e.g. Take after food</string>
-    <string name="repeat_on">Repeat on</string>
-    <string name="mon">Mon</string>
-    <string name="tue">Tue</string>
-    <string name="wed">Wed</string>
-    <string name="thu">Thu</string>
-    <string name="fri">Fri</string>
-    <string name="sat">Sat</string>
-    <string name="sun">Sun</string>
-    <string name="Medicine_photo">Medicine Photo</string>
-    <string name="selected_medicine_photo">Selected medicine photo</string>
-    <string name="take_medicine_photo">Take Medicine Photo</string>
-    <string name="vitamin_d">Vitamin D</string>
-    <string name="_1_tablet">1 Tablet</string>
-    <string name="_11_oct_2026_08_00_am"> 11 oct 2026 08:00 am</string>
     <string name="taken">Taken</string>
-    <string name="_08_00_am">08:00 am</string>
     <string name="enabled">Enabled</string>
-    <string name="delete_reminder_time">Delete reminder time</string>
-    <string name="app_name">Medora Care</string>
-    <string name="Sun">Sun</string>
-    <string name="Mon">Mon</string>
-    <string name="Tue">Tue</string>
-    <string name="Wed">Wed</string>
-    <string name="Thur">Thur</string>
-    <string name="Fri">Fri</string>
-    <string name="Sat">Sat</string>
-    <string name="Enter_medicine_details_and_set_your_reminders">enter_medicine_details_and_set_your_reminders</string>
+    <string name="recent_doses">Recent doses</string>
     <string name="enter_medicine_details_and_set_your_reminders">Enter medicine details and set your reminders</string>
-    <string name="Schedule_reminder">Schedule reminders</string>
-    <string name="Medicine_history">Medicine History</string>
-    <string name="recent_doses">recent doses</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">Good morning, User!</string>
+    <string name="greeting_afternoon">Good afternoon, User!</string>
+    <string name="greeting_evening">Good evening, User!</string>
+    <string name="greeting_hello">Hello, User!</string>
+
+    <!-- Dose tracking -->
+    <string name="notifications_disabled">Notifications are disabled. Enable them in Settings to receive reminders.</string>
+    <string name="dose_marked_taken">Dose marked as taken</string>
+    <string name="dose_marked_not_taken">Dose marked as not taken</string>
+    <string name="could_not_update_dose">Could not update dose: %1$s</string>
+    <string name="your_medicines_will_appear_here">Your medicines will appear here.</string>
+    <string name="medicine_deleted">Medicine deleted</string>
+    <string name="could_not_delete_medicine">Could not delete medicine: %1$s</string>
+    <string name="no_dose_records_today">No dose records for today</string>
+    <string name="dose_pending">Pending</string>
+    <string name="dose_taken">Taken</string>
+    <string name="dose_not_taken">Not taken</string>
+    <string name="dose_missed">Missed</string>
+    <string name="dose_status_format">%1$s • %2$s</string>
+    <string name="dose_taken_button">Taken</string>
+    <string name="dose_not_taken_button">Not taken</string>
+
+    <!-- Stock and supply -->
+    <string name="stock_not_set">Stock remaining: Stock not set</string>
+    <string name="supply_not_available">Estimated supply: Not available</string>
+    <string name="stock_remaining">Stock remaining: %1$s %2$s</string>
+    <string name="schedule_unavailable">Estimated supply: Schedule unavailable</string>
+    <string name="estimated_supply_days">Estimated supply: %1$s days</string>
+    <string name="stock_depleted_warning">Stock depleted — check physical stock</string>
+    <string name="low_stock_warning">Low stock — refill may be needed</string>
+    <string name="medicine_notes_format">Notes: %1$s</string>
+    <string name="no_active_reminders">No active reminders</string>
+    <string name="reminder_times_format">Reminder: %1$s</string>
+    <string name="refill">Refill</string>
+
+    <!-- Add Medicine screen -->
+    <string name="medicine_details_title">Medicine details</string>
+    <string name="medicine_name_required">Medicine name *</string>
+    <string name="medicine_name_hint">e.g. Vitamin D</string>
+    <string name="dosage_required">Dosage *</string>
+    <string name="dosage_hint">e.g. 1 tablet</string>
+    <string name="notes_optional">Notes (optional)</string>
+    <string name="additional_information">Additional information</string>
+
+    <!-- Schedule -->
+    <string name="reminder_schedule">Reminder schedule</string>
+    <string name="reminder_schedule_title">Reminder schedule</string>
+    <string name="choose_medicine_schedule">Choose when this medicine should be scheduled.</string>
+    <string name="every_day_within_date_range">Every day within a date range</string>
+    <string name="only_selected_dates">Only on selected dates</string>
+    <string name="start_date_value">Start date: %1$s</string>
+    <string name="choose_start_date">Choose start date</string>
+    <string name="end_date_value">End date: %1$s</string>
+    <string name="choose_end_date">Choose end date</string>
+    <string name="add_calendar_date">Add a calendar date</string>
+    <string name="no_individual_dates_selected">No individual dates selected</string>
+    <string name="choose_both_dates">Please choose both start and end dates</string>
+    <string name="end_date_invalid">End date must be on or after start date</string>
+    <string name="choose_current_or_future_range">Please choose a future or current date range</string>
+    <string name="select_at_least_one_date">Please select at least one calendar date</string>
+    <string name="select_current_or_future_date">Select at least one current or future date</string>
+
+    <!-- Reminder times -->
     <string name="add_reminder_time">Add reminder time</string>
+    <string name="no_reminder_times_selected">No reminder times selected</string>
+    <string name="reminder_times_title">Reminder times</string>
+    <string name="add_one_or_more_reminder_times">Add one or more times for each scheduled day.</string>
+    <string name="no_reminder_times_added">No reminder times added</string>
+    <string name="reminder_time_already_added">This reminder time is already added</string>
+    <string name="add_at_least_one_reminder_time">Add at least one reminder time</string>
+
+    <!-- Medicine stock inputs -->
+    <string name="medicine_stock_optional">Medicine stock (optional)</string>
+    <string name="stock_details_for_new_medicine">Enter these details when adding a new medicine.</string>
+    <string name="initial_stock_quantity">Initial stock quantity</string>
+    <string name="units_used_per_dose">Units used per dose</string>
+    <string name="stock_unit_hint">Stock unit (e.g. tablets)</string>
+    <string name="tablets_unit">tablets</string>
+    <string name="enter_stock_and_units">Enter both initial stock and units per dose</string>
+    <string name="enter_valid_stock">Enter a valid non-negative stock quantity</string>
+    <string name="units_per_dose_invalid">Units per dose must be greater than zero</string>
+
+    <!-- Medicine photo -->
+    <string name="medicine_photo_optional">Medicine photo (optional)</string>
+    <string name="medicine_photo_preview">Medicine photo preview</string>
+    <string name="take_medicine_photo">Take medicine photo</string>
+    <string name="capture_medicine_photo">Capture medicine photo</string>
+    <string name="selected_medicine_photo">Selected medicine photo</string>
+    <string name="photo_not_captured">Photo was not captured</string>
+    <string name="camera_permission_required">Camera permission is required to take a photo</string>
+    <string name="unable_to_open_camera">Unable to open camera</string>
+
+    <!-- Save and edit -->
+    <string name="save_medicine">Save medicine</string>
+    <string name="update_medicine">Update medicine</string>
+    <string name="medicine_not_found">Medicine not found</string>
+    <string name="enter_medicine_name">Enter medicine name</string>
+    <string name="enter_dosage">Enter dosage</string>
+    <string name="medicine_updated_successfully">Medicine updated successfully</string>
+    <string name="medicine_saved_successfully">Medicine saved successfully</string>
+    <string name="could_not_save_medicine">Could not save medicine: %1$s</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="unable_to_load_medicine">Unable to load medicine details</string>
+    <string name="medicine_no_longer_exists">Medicine no longer exists</string>
+
+    <!-- Refill screen -->
+    <string name="refill_medicine_title">Refill medicine</string>
+    <string name="medicine_name_label">Medicine name</string>
+    <string name="current_stock_label">Current stock</string>
+    <string name="quantity_added">Quantity to add</string>
+    <string name="refill_quantity_hint">Enter quantity to add</string>
+    <string name="add_to_current_stock">Add to current stock</string>
+    <string name="current_stock_not_configured">Current stock: Not configured</string>
+    <string name="current_stock_value">Current stock: %1$s %2$s</string>
+    <string name="configure_stock_before_refill">Set the current stock in medicine details before refilling.</string>
+    <string name="enter_quantity_greater_than_zero">Enter a quantity greater than zero</string>
+    <string name="medicine_stock_updated">Medicine stock updated</string>
+    <string name="stock_update_failed">Stock was not updated. Check the medicine\'s stock settings.</string>
+    <string name="Medicine_history">Medicine History</string>
+    <string name="vitamin_d">Vitamin D</string>
+    <string name="_1_tablet">1 tablet</string>
+    <string name="_11_oct_2026_08_00_am">11 Oct 2026, 08:00 AM</string>
+    <string name="reminder_08_00">Reminder: 08:00 AM</string>
+    <string name="_08_00_am">08:00 AM</string>
+    <string name="delete_reminder_time">Delete reminder time</string>
+
 </resources>

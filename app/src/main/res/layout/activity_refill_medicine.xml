@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Refill medicine"
+            android:text="@string/refill_medicine_title"
             android:textColor="#202124"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Medicine name"
+            android:text="@string/medicine_name_label"
             android:textColor="#252642"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Current stock: —"
+            android:text="@string/current_stock_label"
             android:textColor="#626579"
             android:textSize="16sp" />
 
@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:text="Quantity added"
+            android:text="@string/quantity_added"
             android:textColor="#202124"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -52,8 +52,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Enter refill quantity"
-            android:inputType="numberDecimal|numberSigned"
+            android:hint="@string/refill_quantity_hint"
+            android:inputType="numberDecimal"
             android:minHeight="52dp"
             android:padding="12dp"
             android:singleLine="true" />
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:minHeight="52dp"
-            android:text="Add to current stock"
+            android:text="@string/add_to_current_stock"
             android:textAllCaps="false" />
 
     </LinearLayout>

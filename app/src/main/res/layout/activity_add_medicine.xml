@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Medicine details"
+            android:text="@string/medicine_details_title"
             android:textColor="#20243A"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -24,14 +24,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="20dp"
-            android:text="Stay consistent, stay healthy."
+            android:text="@string/stay_consistent_stay_healthy"
             android:textColor="#687086"
             android:textSize="14sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Medicine name *"
+            android:text="@string/medicine_name_required"
             android:textColor="#292E43"
             android:textStyle="bold" />
 
@@ -41,16 +41,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
-            android:hint="e.g. Vitamin D"
+            android:backgroundTint="#777D98"
+            android:hint="@string/medicine_name_hint"
             android:inputType="textCapSentences"
             android:minHeight="52dp"
-            android:padding="12dp"
-            android:backgroundTint="#777D98" />
+            android:padding="12dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dosage *"
+            android:text="@string/dosage_required"
             android:textColor="#292E43"
             android:textStyle="bold" />
 
@@ -60,16 +60,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
-            android:hint="e.g. 1 tablet"
+            android:backgroundTint="#777D98"
+            android:hint="@string/dosage_hint"
             android:inputType="textCapSentences"
             android:minHeight="52dp"
-            android:padding="12dp"
-            android:backgroundTint="#777D98" />
+            android:padding="12dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Notes (optional)"
+            android:text="@string/notes_optional"
             android:textColor="#292E43"
             android:textStyle="bold" />
 
@@ -79,12 +79,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="22dp"
+            android:backgroundTint="#777D98"
             android:gravity="top"
-            android:hint="Additional information"
+            android:hint="@string/additional_information"
             android:inputType="textCapSentences|textMultiLine"
             android:minHeight="80dp"
-            android:padding="12dp"
-            android:backgroundTint="#777D98" />
+            android:padding="12dp" />
 
         <View
             android:layout_width="match_parent"
@@ -95,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Reminder schedule"
+            android:text="@string/reminder_schedule_title"
             android:textColor="#20243A"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -105,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="8dp"
-            android:text="Choose when this medicine should be scheduled."
+            android:text="@string/choose_medicine_schedule"
             android:textColor="#687086"
             android:textSize="14sp" />
 
@@ -121,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:padding="6dp"
-                android:text="Every day within a date range"
+                android:text="@string/every_day_within_date_range"
                 android:textColor="#292E43" />
 
             <RadioButton
@@ -129,9 +129,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="6dp"
-                android:text="Only on selected dates"
+                android:text="@string/only_selected_dates"
                 android:textColor="#292E43" />
-
         </RadioGroup>
 
         <Button
@@ -140,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:minHeight="52dp"
-            android:text="Choose start date" />
+            android:text="@string/choose_start_date" />
 
         <Button
             android:id="@+id/btnEndDate"
@@ -148,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:minHeight="52dp"
-            android:text="Choose end date" />
+            android:text="@string/choose_end_date" />
 
         <Button
             android:id="@+id/btnAddSelectedDate"
@@ -156,7 +155,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:minHeight="52dp"
-            android:text="Add a calendar date"
+            android:text="@string/add_calendar_date"
             android:visibility="gone" />
 
         <TextView
@@ -166,7 +165,7 @@
             android:layout_marginTop="8dp"
             android:background="#FFFFFF"
             android:padding="12dp"
-            android:text="No individual dates selected"
+            android:text="@string/no_individual_dates_selected"
             android:textColor="#292E43"
             android:textSize="14sp"
             android:visibility="gone" />
@@ -181,7 +180,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Reminder times"
+            android:text="@string/reminder_times_title"
             android:textColor="#20243A"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -190,7 +189,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="Add one or more times for each scheduled day."
+            android:text="@string/add_one_or_more_reminder_times"
             android:textColor="#687086"
             android:textSize="14sp" />
 
@@ -200,7 +199,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:minHeight="52dp"
-            android:text="Add reminder time" />
+            android:text="@string/add_reminder_time" />
 
         <TextView
             android:id="@+id/tvSelectedTimes"
@@ -209,7 +208,7 @@
             android:layout_marginTop="8dp"
             android:background="#FFFFFF"
             android:padding="12dp"
-            android:text="No reminder times added"
+            android:text="@string/no_reminder_times_added"
             android:textColor="#292E43"
             android:textSize="14sp" />
 
@@ -223,7 +222,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Medicine stock (optional)"
+            android:text="@string/medicine_stock_optional"
             android:textColor="#20243A"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -233,7 +232,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="8dp"
-            android:text="Enter these details when adding a new medicine."
+            android:text="@string/stock_details_for_new_medicine"
             android:textColor="#687086"
             android:textSize="14sp" />
 
@@ -242,33 +241,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:hint="Initial stock quantity"
+            android:backgroundTint="#777D98"
+            android:hint="@string/initial_stock_quantity"
             android:inputType="numberDecimal"
             android:minHeight="52dp"
-            android:padding="12dp"
-            android:backgroundTint="#777D98" />
+            android:padding="12dp" />
 
         <EditText
             android:id="@+id/etUnitsPerDose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:hint="Units used per dose"
+            android:backgroundTint="#777D98"
+            android:hint="@string/units_used_per_dose"
             android:inputType="numberDecimal"
             android:minHeight="52dp"
-            android:padding="12dp"
-            android:backgroundTint="#777D98" />
+            android:padding="12dp" />
 
         <EditText
             android:id="@+id/etStockUnit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
-            android:hint="Stock unit (e.g. tablets)"
+            android:backgroundTint="#777D98"
+            android:hint="@string/stock_unit_hint"
             android:inputType="textCapSentences"
             android:minHeight="52dp"
-            android:padding="12dp"
-            android:backgroundTint="#777D98" />
+            android:padding="12dp" />
 
         <View
             android:layout_width="match_parent"
@@ -279,7 +278,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Medicine photo (optional)"
+            android:text="@string/medicine_photo_optional"
             android:textColor="#20243A"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -290,10 +289,10 @@
             android:layout_height="140dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="12dp"
-            android:contentDescription="Medicine photo preview"
+            android:background="#E8EAF2"
+            android:contentDescription="@string/medicine_photo_preview"
             android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_gallery"
-            android:background="#E8EAF2" />
+            android:src="@android:drawable/ic_menu_gallery" />
 
         <Button
             android:id="@+id/btnCaptureMedicine"
@@ -301,7 +300,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:minHeight="52dp"
-            android:text="Capture medicine photo" />
+            android:text="@string/capture_medicine_photo" />
 
         <Button
             android:id="@+id/btnSaveMedicine"
@@ -310,7 +309,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="20dp"
             android:minHeight="56dp"
-            android:text="Save medicine"
+            android:text="@string/save_medicine"
             android:textAllCaps="false"
             android:textSize="16sp" />
 
