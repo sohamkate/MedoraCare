@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F7F8FC"
@@ -17,7 +18,8 @@
             android:text="@string/medicine_details_title"
             android:textColor="#20243A"
             android:textSize="26sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:ignore="VisualLintSystemUi" />
 
         <TextView
             android:layout_width="match_parent"
@@ -32,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/medicine_name_required"
-            android:textColor="#292E43"
+            android:textColor="#20243A"
             android:textStyle="bold" />
 
         <EditText
@@ -41,17 +43,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
-            android:backgroundTint="#777D98"
+            android:backgroundTint="#20243A"
             android:hint="@string/medicine_name_hint"
             android:inputType="textCapSentences"
             android:minHeight="52dp"
-            android:padding="12dp" />
+            android:padding="12dp"
+            tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dosage_required"
-            android:textColor="#292E43"
+            android:textColor="#20243A"
             android:textStyle="bold" />
 
         <EditText
@@ -60,17 +63,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
-            android:backgroundTint="#777D98"
+            android:backgroundTint="#20243A"
             android:hint="@string/dosage_hint"
             android:inputType="textCapSentences"
             android:minHeight="52dp"
-            android:padding="12dp" />
+            android:padding="12dp"
+            tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/notes_optional"
-            android:textColor="#292E43"
+            android:textColor="#20243A"
             android:textStyle="bold" />
 
         <EditText
@@ -79,12 +83,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="22dp"
-            android:backgroundTint="#777D98"
+            android:backgroundTint="#20243A"
             android:gravity="top"
             android:hint="@string/additional_information"
             android:inputType="textCapSentences|textMultiLine"
             android:minHeight="80dp"
-            android:padding="12dp" />
+            android:padding="12dp"
+            tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
         <View
             android:layout_width="match_parent"
@@ -122,7 +127,8 @@
                 android:checked="true"
                 android:padding="6dp"
                 android:text="@string/every_day_within_date_range"
-                android:textColor="#292E43" />
+                android:textColor="#292E43"
+                tools:ignore="VisualLintButtonSize" />
 
             <RadioButton
                 android:id="@+id/rbSelectedDates"
@@ -130,7 +136,8 @@
                 android:layout_height="wrap_content"
                 android:padding="6dp"
                 android:text="@string/only_selected_dates"
-                android:textColor="#292E43" />
+                android:textColor="#292E43"
+                tools:ignore="VisualLintButtonSize" />
         </RadioGroup>
 
         <Button
@@ -139,7 +146,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:minHeight="52dp"
-            android:text="@string/choose_start_date" />
+            android:text="@string/choose_start_date"
+            tools:ignore="VisualLintButtonSize" />
 
         <Button
             android:id="@+id/btnEndDate"
@@ -147,7 +155,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:minHeight="52dp"
-            android:text="@string/choose_end_date" />
+            android:text="@string/choose_end_date"
+            tools:ignore="VisualLintButtonSize" />
 
         <Button
             android:id="@+id/btnAddSelectedDate"
@@ -199,7 +208,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:minHeight="52dp"
-            android:text="@string/add_reminder_time" />
+            android:text="@string/add_reminder_time"
+            tools:ignore="VisualLintButtonSize" />
 
         <TextView
             android:id="@+id/tvSelectedTimes"
@@ -241,33 +251,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:backgroundTint="#777D98"
+            android:backgroundTint="#20243A"
             android:hint="@string/initial_stock_quantity"
             android:inputType="numberDecimal"
             android:minHeight="52dp"
-            android:padding="12dp" />
+            android:padding="12dp"
+            tools:ignore="Autofill,VisualLintTextFieldSize" />
 
         <EditText
             android:id="@+id/etUnitsPerDose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:backgroundTint="#777D98"
+            android:backgroundTint="#20243A"
             android:hint="@string/units_used_per_dose"
             android:inputType="numberDecimal"
             android:minHeight="52dp"
-            android:padding="12dp" />
+            android:padding="12dp"
+            tools:ignore="Autofill,VisualLintTextFieldSize" />
 
         <EditText
             android:id="@+id/etStockUnit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
-            android:backgroundTint="#777D98"
+            android:backgroundTint="#20243A"
             android:hint="@string/stock_unit_hint"
             android:inputType="textCapSentences"
             android:minHeight="52dp"
-            android:padding="12dp" />
+            android:padding="12dp"
+            tools:ignore="Autofill,VisualLintTextFieldSize" />
 
         <View
             android:layout_width="match_parent"
@@ -300,7 +313,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:minHeight="52dp"
-            android:text="@string/capture_medicine_photo" />
+            android:text="@string/capture_medicine_photo"
+            tools:ignore="VisualLintButtonSize" />
 
         <Button
             android:id="@+id/btnSaveMedicine"
@@ -311,7 +325,8 @@
             android:minHeight="56dp"
             android:text="@string/save_medicine"
             android:textAllCaps="false"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="VisualLintButtonSize" />
 
     </LinearLayout>
 </ScrollView>

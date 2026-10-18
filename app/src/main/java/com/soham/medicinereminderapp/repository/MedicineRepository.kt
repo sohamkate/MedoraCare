@@ -148,5 +148,16 @@ class MedicineRepository(private val dao: MedicineDao) {
     ): List<String> {
         return dao.getScheduledDateStrings(medicineId)
     }
+    fun getDoseLogsBetween(
+        startTime: Long,
+        endTime: Long
+    ): kotlinx.coroutines.flow.Flow<List<DoseLog>> {
+        return dao.getDoseLogsBetween(startTime, endTime)
+    }
 
+    suspend fun markPendingDosesMissedBefore(
+        cutoffTime: Long
+    ): Int {
+        return dao.markPendingDosesMissedBefore(cutoffTime)
+    }
 }

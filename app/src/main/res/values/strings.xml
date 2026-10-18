@@ -34,6 +34,14 @@
     <string name="recent_doses">Recent doses</string>
     <string name="enter_medicine_details_and_set_your_reminders">Enter medicine details and set your reminders</string>
 
+    <!-- History Search -->
+    <string name="search_medicine_history">Search by medicine name...</string>
+    <string name="no_matching_medicine_history">No matching medicine history found.</string>
+    <string name="history_dosage_format">Dosage: %1$s</string>
+    <string name="history_scheduled_format">Scheduled: %1$s</string>
+    <string name="history_status_format">Status: %1$s</string>
+    <string name="history_taken_at_format">Taken at: %1$s</string>
+
     <!-- Greetings -->
     <string name="greeting_morning">Good morning, User!</string>
     <string name="greeting_afternoon">Good afternoon, User!</string>
@@ -153,6 +161,8 @@
     <string name="enter_quantity_greater_than_zero">Enter a quantity greater than zero</string>
     <string name="medicine_stock_updated">Medicine stock updated</string>
     <string name="stock_update_failed">Stock was not updated. Check the medicine\'s stock settings.</string>
+
+    <!-- Sample and reminder labels -->
     <string name="Medicine_history">Medicine History</string>
     <string name="vitamin_d">Vitamin D</string>
     <string name="_1_tablet">1 tablet</string>
@@ -160,5 +170,40 @@
     <string name="reminder_08_00">Reminder: 08:00 AM</string>
     <string name="_08_00_am">08:00 AM</string>
     <string name="delete_reminder_time">Delete reminder time</string>
+
+    <!-- Adherence analytics -->
+    <string name="adherence_title">Dose Tracking &amp; Analytics</string>
+    <string name="period_7_days">Last 7 Days</string>
+    <string name="period_30_days">Last 30 Days</string>
+    <string name="adherence_initial_percent">0%</string>
+    <string name="adherence_percent">%1$d%% adherence</string>
+    <string name="adherence_definition">Adherence is calculated from resolved dose records. Pending doses are excluded.</string>
+    <string name="doses_taken_initial">Taken: 0</string>
+    <string name="doses_missed_initial">Missed: 0</string>
+    <string name="doses_not_taken_initial">Not taken: 0</string>
+    <string name="doses_pending_initial">Pending: 0</string>
+    <string name="doses_total_initial">Total records: 0</string>
+    <string name="doses_taken_count">Taken: %1$d</string>
+    <string name="doses_missed_count">Missed: %1$d</string>
+    <string name="doses_not_taken_count">Not taken / skipped: %1$d</string>
+    <string name="doses_pending_count">Pending: %1$d</string>
+    <string name="doses_total_count">Total records: %1$d</string>
+    <string name="adherence_empty">No resolved dose records yet.</string>
+    <string name="adherence_insight_high">Good recorded adherence. Keep following your prescribed schedule.</string>
+    <string name="adherence_insight_medium">Some doses were not recorded as taken. Review your dose history.</string>
+    <string name="adherence_insight_low">Many doses were not recorded as taken. Review your reminders and dose history.</string>
+    <string name="no_dose_records_analytics">No dose records are available for this period.</string>
+    <string name="adherence_disclaimer">This report reflects app records only and cannot confirm that a medicine was actually taken.</string>
+    <string name="analytics">Analytics</string>
+    <string name="dose_statistics">Dose statistics</string>
+    <string name="green_taken_red_missed_yellow_pending_or_mixed">Green: taken Red: missed Yellow: pending or mixed</string>
+    <string name="next_month">Next month</string>
+    <string name="previous_month">Previous month</string>
+    <string name="_0">0%</string>
+    <string name="october_2026">October 2026</string>
+    <string name="Refill">Refill</string>
+    <string name="estimated_supply">Estimated supply: —</string>
+    <string name="stock_remaining_stock_not_set">Stock remaining: Stock not set</string>
+    <string name="regular_medicine_taking">Regular Medicine Taking</string>
 
 </resources>

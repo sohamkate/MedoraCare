@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- App -->
+    <string name="app_name">Medora Care</string>
+
     <!-- Language -->
     <string name="language_english">English</string>
     <string name="language_hindi">हिन्दी</string>
@@ -11,7 +14,6 @@
     </string-array>
 
     <!-- Dashboard -->
-    <string name="app_name">Medora Care</string>
     <string name="good_morning_user">सुप्रभात, User!</string>
     <string name="stay_consistent_stay_healthy">नियमित रहें, स्वस्थ रहें।</string>
     <string name="medicine_details">दवा का विवरण 💊</string>
@@ -33,6 +35,14 @@
     <string name="enabled">चालू</string>
     <string name="recent_doses">हाल की खुराक</string>
     <string name="enter_medicine_details_and_set_your_reminders">दवा का विवरण भरें और रिमाइंडर सेट करें</string>
+
+    <!-- History Search -->
+    <string name="search_medicine_history">दवा के नाम से खोजें...</string>
+    <string name="no_matching_medicine_history">दवा के इतिहास में कोई परिणाम नहीं मिला।</string>
+    <string name="history_dosage_format">खुराक: %1$s</string>
+    <string name="history_scheduled_format">निर्धारित समय: %1$s</string>
+    <string name="history_status_format">स्थिति: %1$s</string>
+    <string name="history_taken_at_format">दवा लेने का समय: %1$s</string>
 
     <!-- Greetings -->
     <string name="greeting_morning">सुप्रभात, User!</string>
@@ -56,6 +66,31 @@
     <string name="dose_status_format">%1$s • %2$s</string>
     <string name="dose_taken_button">ली गई</string>
     <string name="dose_not_taken_button">नहीं ली गई</string>
+
+    <!-- Adherence Analytics -->
+    <string name="analytics">विश्लेषण</string>
+    <string name="adherence_title">दवा लेने की नियमितता</string>
+    <string name="period_7_days">पिछले 7 दिन</string>
+    <string name="period_30_days">पिछले 30 दिन</string>
+    <string name="adherence_percent">%1$d%% नियमितता</string>
+    <string name="adherence_initial_percent">0%% नियमितता</string>
+    <string name="adherence_definition">नियमितता उन दर्ज खुराकों के आधार पर निकाली जाती है जिन्हें आपने लिया या नहीं लिया बताया है। लंबित खुराकें इसमें शामिल नहीं हैं।</string>
+    <string name="doses_taken_count">ली गई खुराकें: %1$d</string>
+    <string name="doses_missed_count">छूटी हुई खुराकें: %1$d</string>
+    <string name="doses_not_taken_count">नहीं ली गई खुराकें: %1$d</string>
+    <string name="doses_pending_count">लंबित खुराकें: %1$d</string>
+    <string name="doses_total_count">कुल दर्ज खुराकें: %1$d</string>
+    <string name="doses_taken_initial">ली गई खुराकें: 0</string>
+    <string name="doses_missed_initial">छूटी हुई खुराकें: 0</string>
+    <string name="doses_not_taken_initial">नहीं ली गई खुराकें: 0</string>
+    <string name="doses_pending_initial">लंबित खुराकें: 0</string>
+    <string name="doses_total_initial">कुल दर्ज खुराकें: 0</string>
+    <string name="adherence_empty">इस अवधि के लिए कोई खुराक रिकॉर्ड उपलब्ध नहीं है।</string>
+    <string name="no_dose_records_analytics">विश्लेषण दिखाने के लिए पहले खुराक के रिकॉर्ड जोड़ें।</string>
+    <string name="adherence_insight_high">बहुत अच्छा! आप अपनी दवा लेने में नियमित हैं। इसी तरह जारी रखें।</string>
+    <string name="adherence_insight_medium">आपकी नियमितता अच्छी दिशा में है। निर्धारित खुराकों को समय पर दर्ज करने का प्रयास करें।</string>
+    <string name="adherence_insight_low">अपनी खुराकों के रिकॉर्ड की समीक्षा करें। दवा लेने के समय के बारे में संदेह हो तो अपने डॉक्टर या फार्मासिस्ट से सलाह लें।</string>
+    <string name="adherence_disclaimer">यह रिपोर्ट केवल दर्ज किए गए रिकॉर्ड पर आधारित है और चिकित्सकीय सलाह का विकल्प नहीं है।</string>
 
     <!-- Stock and supply -->
     <string name="stock_not_set">शेष स्टॉक: स्टॉक सेट नहीं है</string>
@@ -153,6 +188,8 @@
     <string name="enter_quantity_greater_than_zero">शून्य से अधिक मात्रा दर्ज करें</string>
     <string name="medicine_stock_updated">दवा का स्टॉक अपडेट हुआ</string>
     <string name="stock_update_failed">स्टॉक अपडेट नहीं हुआ। दवा की स्टॉक सेटिंग जाँचें।</string>
+
+    <!-- Sample and reminder labels -->
     <string name="Medicine_history">दवा का इतिहास</string>
     <string name="vitamin_d">विटामिन डी</string>
     <string name="_1_tablet">1 टैबलेट</string>
@@ -160,6 +197,5 @@
     <string name="reminder_08_00">रिमाइंडर: सुबह 08:00 बजे</string>
     <string name="_08_00_am">सुबह 08:00 बजे</string>
     <string name="delete_reminder_time">रिमाइंडर का समय हटाएँ</string>
-
 
 </resources>

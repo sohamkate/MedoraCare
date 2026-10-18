@@ -266,5 +266,24 @@ interface MedicineDao {
     suspend fun getScheduledDateStrings(
         medicineId: Int
     ): List<String>
+    @Query("""
+    UPDATE dose_logs
+    SET status = 'MISSED'
+    WHERE status = 'PENDING'
+      AND scheduledTime < :cutoffTime
+""")
+    suspend fun markPendingDosesMissedBefore(
+        cutoffTime: Long
+    ): Int
 
+    @Query("""
+    SELECT * FROM dose_logs
+    WHERE scheduledTime >= :startTime
+      AND scheduledTime <= :endTime
+    ORDER BY scheduledTime DESC
+""")
+    fun getDoseLogsBetween(
+        startTime: Long,
+        endTime: Long
+    ): kotlinx.coroutines.flow.Flow<List<DoseLog>>
 }

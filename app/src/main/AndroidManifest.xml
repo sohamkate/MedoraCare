@@ -73,7 +73,9 @@
         <activity
             android:name=".RefillMedicineActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".AdherenceAnalyticsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

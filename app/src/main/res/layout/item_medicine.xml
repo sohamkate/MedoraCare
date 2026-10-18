@@ -82,7 +82,7 @@
                 android:id="@+id/tvStockQuantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Stock remaining: Stock not set"
+                android:text="@string/stock_remaining_stock_not_set"
                 android:textColor="#252642"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Estimated supply: —"
+                android:text="@string/estimated_supply"
                 android:textColor="#626579"
                 android:textSize="13sp" />
 
@@ -140,7 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Refill"
+                android:text="@string/Refill"
                 android:textAllCaps="false"
                 tools:ignore="ButtonStyle" />
             <Button

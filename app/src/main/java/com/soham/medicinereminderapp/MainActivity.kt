@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
@@ -25,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.soham.medicinereminderapp.data.AppDatabase
 import com.soham.medicinereminderapp.data.Medicine
+import com.soham.medicinereminderapp.reminder.AdherenceWorkScheduler
 import com.soham.medicinereminderapp.reminder.LowStockWorkScheduler
 import com.soham.medicinereminderapp.reminder.ReminderScheduler
 import com.soham.medicinereminderapp.repository.MedicineRepository
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: MedicineAdapter
     private lateinit var repository: MedicineRepository
+    private lateinit var bottomNavigation: BottomNavigationView
 
     private val notificationPermissionLauncher =
         registerForActivityResult(
@@ -65,37 +68,21 @@ class MainActivity : AppCompatActivity() {
 
         setupLanguageSpinner()
 
-        val bottomNavigation =
-            findViewById<BottomNavigationView>(R.id.bottomNavigation)
-
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> true
-
-                R.id.nav_history -> {
-                    startActivity(
-                        Intent(this, HistoryActivity::class.java)
-                    )
-                    true
-                }
-
-                else -> false
-            }
-        }
-
-        val dao = AppDatabase
-            .getDatabase(applicationContext)
-            .medicineDao()
+        val dao = AppDatabase.getDatabase(
+            applicationContext
+        ).medicineDao()
 
         repository = MedicineRepository(dao)
+
+        setupBottomNavigation()
 
         tvGreeting.text = getGreeting()
 
         requestNotificationPermission()
 
-        // Schedule recurring stock checks and run one immediately.
         LowStockWorkScheduler.schedulePeriodic(this)
         LowStockWorkScheduler.checkNow(this)
+        AdherenceWorkScheduler.schedule(applicationContext)
 
         adapter = MedicineAdapter(
             onEditClick = { medicine ->
@@ -105,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 ).apply {
                     putExtra("medicineId", medicine.id)
                 }
+
                 startActivity(intent)
             },
 
@@ -122,11 +110,12 @@ class MainActivity : AppCompatActivity() {
                                     System.currentTimeMillis()
                                 )
                             } else {
-                                repository.markDoseAsNotTaken(doseLog.id)
+                                repository.markDoseAsNotTaken(
+                                    doseLog.id
+                                )
                             }
                         }
 
-                        // Recheck supply after stock is deducted.
                         if (taken) {
                             LowStockWorkScheduler.checkNow(
                                 this@MainActivity
@@ -176,7 +165,10 @@ class MainActivity : AppCompatActivity() {
 
         btnAddMedicine.setOnClickListener {
             startActivity(
-                Intent(this, AddMedicineActivity::class.java)
+                Intent(
+                    this,
+                    AddMedicineActivity::class.java
+                )
             )
         }
 
@@ -184,16 +176,63 @@ class MainActivity : AppCompatActivity() {
         observeTodayDoseLogs()
     }
 
+    private fun setupBottomNavigation() {
+        bottomNavigation = findViewById(R.id.bottomNavigation)
+        bottomNavigation.selectedItemId = R.id.nav_home
+
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> true
+
+                R.id.nav_history -> {
+                    navigateTo(HistoryActivity::class.java)
+                    true
+                }
+
+                R.id.nav_analytics -> {
+                    navigateTo(
+                        AdherenceAnalyticsActivity::class.java
+                    )
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    private fun navigateTo(destination: Class<*>) {
+        if (destination == this::class.java) return
+
+        val intent = Intent(this, destination).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+
+        startActivity(intent)
+    }
+
     private fun setupLanguageSpinner() {
         val spinnerLanguage =
             findViewById<Spinner>(R.id.spinnerLanguage)
 
-        val currentLanguage =
-            AppCompatDelegate.getApplicationLocales()
-                .get(0)?.language ?: "en"
+        // Use a custom layout to control the selected text color.
+        val languageAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.app_languages,
+            R.layout.item_language_selected
+        )
 
-        // Select the currently active app language without triggering
-        // a language change during initial setup.
+        languageAdapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item
+        )
+
+        spinnerLanguage.adapter = languageAdapter
+
+        val currentLanguage = AppCompatDelegate
+            .getApplicationLocales()
+            .get(0)?.language ?: "en"
+
         spinnerLanguage.setSelection(
             if (currentLanguage == "hi") 1 else 0,
             false
@@ -214,9 +253,9 @@ class MainActivity : AppCompatActivity() {
                         else -> return
                     }
 
-                    val activeLanguage =
-                        AppCompatDelegate.getApplicationLocales()
-                            .get(0)?.language ?: "en"
+                    val activeLanguage = AppCompatDelegate
+                        .getApplicationLocales()
+                        .get(0)?.language ?: "en"
 
                     if (selectedLanguage != activeLanguage) {
                         AppCompatDelegate.setApplicationLocales(
@@ -235,8 +274,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        // Recheck stock when returning from Add/Edit/Refill.
         LowStockWorkScheduler.checkNow(this)
     }
 
@@ -246,16 +283,20 @@ class MainActivity : AppCompatActivity() {
     ) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                repository.getMedicinesWithTimes().collect { medicines ->
-                    adapter.submitList(medicines)
+                repository.getMedicinesWithTimes()
+                    .collect { medicines ->
 
-                    val isEmpty = medicines.isEmpty()
+                        adapter.submitList(medicines)
 
-                    emptyState.visibility =
-                        if (isEmpty) View.VISIBLE else View.GONE
+                        val isEmpty = medicines.isEmpty()
 
-                    emptyMessage.text =
-                        if (isEmpty) {
+                        emptyState.visibility = if (isEmpty) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
+
+                        emptyMessage.text = if (isEmpty) {
                             getString(
                                 R.string.no_medicines_added_yet_tap_add_medicine_to_get_started
                             )
@@ -264,7 +305,7 @@ class MainActivity : AppCompatActivity() {
                                 R.string.your_medicines_will_appear_here
                             )
                         }
-                }
+                    }
             }
         }
     }
@@ -280,6 +321,7 @@ class MainActivity : AppCompatActivity() {
         val startOfDay = calendar.timeInMillis
 
         calendar.add(Calendar.DAY_OF_YEAR, 1)
+
         val endOfDay = calendar.timeInMillis
 
         lifecycleScope.launch {
@@ -299,19 +341,23 @@ class MainActivity : AppCompatActivity() {
             try {
                 withContext(Dispatchers.IO) {
                     val medicineWithTimes =
-                        repository.getMedicineWithTimes(medicine.id)
-
-                    medicineWithTimes?.reminderTimes?.forEach { reminderTime ->
-                        ReminderScheduler.cancelReminder(
-                            this@MainActivity,
-                            reminderTime.id
+                        repository.getMedicineWithTimes(
+                            medicine.id
                         )
 
-                        ReminderScheduler.cancelSnooze(
-                            this@MainActivity,
-                            reminderTime.id
-                        )
-                    }
+                    medicineWithTimes?.reminderTimes
+                        ?.forEach { reminderTime ->
+
+                            ReminderScheduler.cancelReminder(
+                                this@MainActivity,
+                                reminderTime.id
+                            )
+
+                            ReminderScheduler.cancelSnooze(
+                                this@MainActivity,
+                                reminderTime.id
+                            )
+                        }
 
                     repository.deleteMedicine(medicine)
                 }
@@ -351,7 +397,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permission = Manifest.permission.POST_NOTIFICATIONS
+            val permission =
+                Manifest.permission.POST_NOTIFICATIONS
 
             if (
                 ContextCompat.checkSelfPermission(
