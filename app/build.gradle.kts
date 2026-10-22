@@ -1,9 +1,8 @@
-
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
-
 android {
     namespace = "com.soham.medicinereminderapp"
     compileSdk = 37
@@ -40,6 +39,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.9")
     // Room database
     implementation("androidx.room:room-runtime:2.8.0")
     implementation("androidx.room:room-ktx:2.8.0")
@@ -61,4 +61,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    //Firebase
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:35.0.2"))
+    implementation("com.google.firebase:firebase-functions")
+
+    // TODO: Add the dependencies for Firebase products you want to use
+    // When using the BoM, don't specify versions in Firebase dependencies
+    // https://firebase.google.com/docs/android/setup#available-libraries
 }

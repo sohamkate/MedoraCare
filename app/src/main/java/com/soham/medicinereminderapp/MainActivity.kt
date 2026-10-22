@@ -1,4 +1,3 @@
-
 package com.soham.medicinereminderapp
 
 import android.Manifest
@@ -24,6 +23,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.soham.medicinereminderapp.data.AppDatabase
 import com.soham.medicinereminderapp.data.Medicine
 import com.soham.medicinereminderapp.reminder.AdherenceWorkScheduler
@@ -59,6 +59,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Open the AI assistant from the dashboard card.
+        findViewById<View>(R.id.cardAskAi).setOnClickListener {
+            openAiAssistant()
+        }
+
+        // Open the AI assistant from the floating button.
+        findViewById<FloatingActionButton>(R.id.fabAskAi)
+            .setOnClickListener {
+                openAiAssistant()
+            }
 
         val tvGreeting = findViewById<TextView>(R.id.tvGreeting)
         val tvEmptyMessage = findViewById<TextView>(R.id.tvEmptyMessage)
@@ -176,26 +187,31 @@ class MainActivity : AppCompatActivity() {
         observeTodayDoseLogs()
     }
 
+    private fun openAiAssistant() {
+        startActivity(
+            Intent(this, AiAssistantActivity::class.java)
+        )
+    }
+
     private fun setupBottomNavigation() {
         bottomNavigation = findViewById(R.id.bottomNavigation)
+
+        // ADD THIS LINE: Removes default tint so your original images display properly
+        bottomNavigation.itemIconTintList = null
+
         bottomNavigation.selectedItemId = R.id.nav_home
 
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true
-
                 R.id.nav_history -> {
                     navigateTo(HistoryActivity::class.java)
                     true
                 }
-
                 R.id.nav_analytics -> {
-                    navigateTo(
-                        AdherenceAnalyticsActivity::class.java
-                    )
+                    navigateTo(AdherenceAnalyticsActivity::class.java)
                     true
                 }
-
                 else -> false
             }
         }
@@ -216,7 +232,6 @@ class MainActivity : AppCompatActivity() {
         val spinnerLanguage =
             findViewById<Spinner>(R.id.spinnerLanguage)
 
-        // Use a custom layout to control the selected text color.
         val languageAdapter = ArrayAdapter.createFromResource(
             this,
             R.array.app_languages,

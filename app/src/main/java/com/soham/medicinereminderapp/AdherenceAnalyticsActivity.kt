@@ -112,20 +112,26 @@ class AdherenceAnalyticsActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+
+        // ADD THIS LINE: Removes tint so your original images show
+        bottomNavigation.itemIconTintList = null
+
+        bottomNavigation.selectedItemId = R.id.nav_analytics // Make sure Analytics is selected
+
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
-                    navigateTo(MainActivity::class.java)
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
                     true
                 }
-
                 R.id.nav_history -> {
-                    navigateTo(HistoryActivity::class.java)
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                    finish()
                     true
                 }
-
                 R.id.nav_analytics -> true
-
                 else -> false
             }
         }

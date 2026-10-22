@@ -75,23 +75,26 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
-        bottomNavigation = findViewById(R.id.bottomNavigation)
-        bottomNavigation.selectedItemId = R.id.nav_history
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+
+        // ADD THIS LINE: Removes tint so your original images show
+        bottomNavigation.itemIconTintList = null
+
+        bottomNavigation.selectedItemId = R.id.nav_history // Make sure History is selected
 
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
-                    navigateTo(MainActivity::class.java)
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
                     true
                 }
-
                 R.id.nav_history -> true
-
                 R.id.nav_analytics -> {
-                    navigateTo(AdherenceAnalyticsActivity::class.java)
+                    startActivity(Intent(this, AdherenceAnalyticsActivity::class.java))
+                    finish()
                     true
                 }
-
                 else -> false
             }
         }
