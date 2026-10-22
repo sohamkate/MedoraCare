@@ -81,9 +81,10 @@
                             android:id="@+id/imgAskAi"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
+                            android:contentDescription="@string/medora_ai_logo"
+                            android:scaleType="fitCenter"
                             android:src="@drawable/ic_medora_ai_image"
-                            android:contentDescription="Medora AI logo"
-                            android:scaleType="fitCenter" />
+                            tools:ignore="ImageContrastCheck" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -95,7 +96,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Ask Medora AI"
+                                android:text="@string/ask_medora_ai"
                                 android:textColor="#173B68"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -104,7 +105,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Your medicine and wellness assistant"
+                                android:text="@string/your_medicine_and_wellness_assistant"
                                 android:textColor="#355579"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -112,7 +113,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="›"
+                            android:text="@string/arrow"
                             android:textColor="#2457A7"
                             android:textSize="30sp" />
 
@@ -202,13 +203,14 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="88dp"
-        android:contentDescription="Open Medora AI assistant"
-        android:src="@drawable/ic_medora_ai_image"
+        android:contentDescription="@string/open_medora_ai_assistant"
         android:scaleType="fitCenter"
-        app:fabCustomSize="64dp"
+        android:src="@drawable/ic_medora_ai_image"
         app:backgroundTint="#FFFFFF"
         app:borderWidth="0dp"
         app:elevation="6dp"
-        app:tint="@null" />
+        app:fabCustomSize="64dp"
+        app:tint="@null"
+        tools:ignore="ClassNameCheck" />
 
 </FrameLayout>

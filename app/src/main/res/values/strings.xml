@@ -205,5 +205,17 @@
     <string name="estimated_supply">Estimated supply: —</string>
     <string name="stock_remaining_stock_not_set">Stock remaining: Stock not set</string>
     <string name="regular_medicine_taking">Regular Medicine Taking</string>
+    <string name="for_general_information_only_do_not_change_medicine_doses_based_on_ai_advice_ask_a_qualified_healthcare_professional_for_medical_decisions">For general information only. Do not change medicine doses based on AI advice. Ask a qualified healthcare professional for medical decisions.</string>
+    <string name="medicine_and_wellness_assistant">Medicine and wellness assistant</string>
+    <string name="medora_ai">Medora AI</string>
+    <string name="arror">‹</string>
+    <string name="go_back">Go back</string>
+    <string name="send">Send</string>
+    <string name="ask_a_question">Ask a question...</string>
+    <string name="medora_ai_logo">Medora AI logo</string>
+    <string name="ask_medora_ai">Ask Medora AI</string>
+    <string name="your_medicine_and_wellness_assistant">Your medicine and wellness assistant</string>
+    <string name="arrow">›</string>
+    <string name="open_medora_ai_assistant">Open Medora AI assistant</string>
 
 </resources>

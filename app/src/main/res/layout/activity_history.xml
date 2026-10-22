@@ -45,6 +45,7 @@
                 android:layout_marginTop="22dp"
                 android:background="@android:drawable/edit_text"
                 android:hint="@string/search_medicine_history"
+                android:imeOptions="actionSearch"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:paddingStart="14dp"
@@ -53,7 +54,7 @@
                 android:textColor="#202544"
                 android:textColorHint="#737991"
                 android:textSize="15sp"
-                android:imeOptions="actionSearch" />
+                tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
 
             <TextView
                 android:layout_width="match_parent"
